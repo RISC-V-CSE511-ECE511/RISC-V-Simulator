@@ -18,7 +18,7 @@ BOOST_AUTO_TEST_CASE( getBinaryValueTest ) {
   Register test_register;
   test_register.setName( "r5" );
 
-  BOOST_REQUIRE_EQUAL( test_register.getBinaryRep(), "00101" );
+  BOOST_REQUIRE_EQUAL( test_register.getBinaryValue(), "00101" );
 }
 
 BOOST_AUTO_TEST_SUITE_END()

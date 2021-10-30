@@ -1,12 +1,14 @@
 #include <string>
 
+#include "operand.hpp"
+
 namespace assembler {
-struct Register {
+struct Register : Operand {
  private:
   std::string m_register_name;
 
  public:
-  std::string getBinaryRep() {
+  std::string getBinaryValue() override {
     // TODO : Implement the register name to binary logic
     return "00101";
   }

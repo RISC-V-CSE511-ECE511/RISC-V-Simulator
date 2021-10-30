@@ -1,9 +1,11 @@
 #include <bitset>
 #include <range/v3/all.hpp>
 
+#include "operand.hpp"
+
 namespace assembler {
 
-struct Immediate {
+struct Immediate : Operand {
  private:
   std::bitset<64> binary_value;
   std::int64_t m_value;
@@ -17,7 +19,7 @@ struct Immediate {
 
   std::int32_t getOperandLength() { return m_operand_length; }
 
-  std::string getBinaryValue() {
+  std::string getBinaryValue() override {
     binary_value = m_value;
     return binary_value.to_string() |
            ranges::action::drop( 64 - m_operand_length );
