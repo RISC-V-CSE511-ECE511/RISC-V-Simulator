@@ -8,15 +8,13 @@ using namespace assembler;
 BOOST_AUTO_TEST_SUITE( register_operand_methods )
 
 BOOST_AUTO_TEST_CASE( accessors_test ) {
-  Register test_register;
-  test_register.setName( "r5" );
+  Register test_register( "r5" );
 
   BOOST_REQUIRE_EQUAL( test_register.getName(), "r5" );
 }
 
 BOOST_AUTO_TEST_CASE( getBinaryValueTest ) {
-  Register test_register;
-  test_register.setName( "r5" );
+  Register test_register( "r5" );
 
   BOOST_REQUIRE_EQUAL( test_register.getBinaryValue(), "00101" );
 }
