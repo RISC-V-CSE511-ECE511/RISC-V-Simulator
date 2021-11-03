@@ -31,9 +31,7 @@ struct Instruction {
   std::shared_ptr<assembler::Operand> getOperand( int index ) {
     return m_operands.at( index );
   }
-  std::int32_t getOperandCount(){
-    return m_operands.size();
-  }
+  std::int32_t getOperandCount() { return m_operands.size(); }
 
  private:
   std::vector<std::string_view> getInstructionComponents() {
@@ -108,13 +106,13 @@ BOOST_AUTO_TEST_CASE( get_operand_out_of_bounds ) {
 BOOST_AUTO_TEST_CASE( get_operand ) {
   Instruction test_instr( "label: add r1 r2 r3" );
 
-  BOOST_REQUIRE_EQUAL( ((Register*)test_instr.getOperand( 0 ).get())->getName(), "r1" );
+  BOOST_REQUIRE_EQUAL(
+      ( (Register*)test_instr.getOperand( 0 ).get() )->getName(), "r1" );
 }
-BOOST_AUTO_TEST_CASE( get_operand_count)
-{
-  Instruction test_instr("label: add r1 r2 r3");
+BOOST_AUTO_TEST_CASE( get_operand_count ) {
+  Instruction test_instr( "label: add r1 r2 r3" );
 
-  BOOST_REQUIRE_EQUAL(test_instr.getOperandCount(),3);
+  BOOST_REQUIRE_EQUAL( test_instr.getOperandCount(), 3 );
 }
 
 BOOST_AUTO_TEST_SUITE_END()
