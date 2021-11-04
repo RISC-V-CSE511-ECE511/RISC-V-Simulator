@@ -17,6 +17,7 @@ struct Instruction {
   std::string_view m_label_name;
   std::string m_raw_instr;
   std::string_view m_instr_name;
+  std::string m_opcode;
 
   std::vector<std::shared_ptr<assembler::Operand>> m_operands;
 
@@ -34,15 +35,15 @@ struct Instruction {
 
  private:
   std::vector<std::string_view> getInstructionComponents() {
-    std::vector<std::string_view> instruction_components;
-    instruction_components =
-        m_raw_instr | ranges::view::split( ' ' ) |
-        ranges::view::transform( []( auto&& component ) {
-          return std::string_view( &*component.begin(),
-                                   ranges::distance( component ) );
-        } ) |
-        ranges::to_vector;
-    return instruction_components;
+    //   std::vector<std::string_view> instruction_components;
+    //   instruction_components =
+    //       m_raw_instr | ranges::view::split( ' ' ) |
+    //       ranges::view::transform( []( auto&& component ) {
+    //         return std::string_view( &*component.begin(),
+    //                                  ranges::distance( component ) );
+    //       } ) |
+    //       ranges::to_vector;
+    // return instruction_components;
   }
 
   void parseInstruction() {
@@ -74,6 +75,11 @@ struct Instruction {
               new Immediate( std::stoll( std::string( component ) ), 12 ) );
       }
     }
+  }
+
+  void getOpCode() {
+
+    return 
   }
 
   bool isLabel( std::string_view str ) {
