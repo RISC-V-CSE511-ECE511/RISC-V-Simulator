@@ -4,10 +4,10 @@
 #include <assembler/operand.hpp>
 #include <assembler/register.hpp>
 #include <boost/test/unit_test.hpp>
+#include <map>
 #include <memory>
 #include <range/v3/all.hpp>
 #include <stdexcept>
-#include <map>
 #include <string>
 #include <string_view>
 
@@ -20,26 +20,24 @@ struct Instruction {
   std::string m_raw_instr;
   std::string m_instr_name;
   std::string m_opcode;
-  std::unordered_map<std::string,std::string> opcode_map{
-    {"addi","1100100{}000{}{}"},
-    {"sub","1100110{}000{}{}0000010"},
-    {"add","1100110{}000{}{}0000000"},
-    {"lw","1100000{}010{}{}"},
-    {"sw","1100010{}010{}{}{}"},
-    {"jalr","1110011{}000{}{}"},
-    {"jal","1111011{}{}{}"},
-    {"beq","1100011{}000{}{}{}"},
-    {"bne","1100011{}100{}{}{}"},
-    {"blt","1100011{}001{}{}{}"},
-    {"bge","1100011{}001{}{}{}"},
-    {"lui","1110110{}{}"},
-    {"and","1100110{}111{}{}0000000"},
-    {"or","1100110{}011{}{}0000000"},
-    {"xor","1100110{}001{}{}0000000"},
-    {"sll","1100110{}100{}{}0000000"},
-    {"sra","1100110{}101{}{}0000010"}
-    };
-
+  std::unordered_map<std::string, std::string> opcode_map{
+      { "addi", "1100100{}000{}{}" },
+      { "sub", "1100110{}000{}{}0000010" },
+      { "add", "1100110{}000{}{}0000000" },
+      { "lw", "1100000{}010{}{}" },
+      { "sw", "1100010{}010{}{}{}" },
+      { "jalr", "1110011{}000{}{}" },
+      { "jal", "1111011{}{}{}" },
+      { "beq", "1100011{}000{}{}{}" },
+      { "bne", "1100011{}100{}{}{}" },
+      { "blt", "1100011{}001{}{}{}" },
+      { "bge", "1100011{}001{}{}{}" },
+      { "lui", "1110110{}{}" },
+      { "and", "1100110{}111{}{}0000000" },
+      { "or", "1100110{}011{}{}0000000" },
+      { "xor", "1100110{}001{}{}0000000" },
+      { "sll", "1100110{}100{}{}0000000" },
+      { "sra", "1100110{}101{}{}0000010" } };
 
   std::vector<std::shared_ptr<assembler::Operand>> m_operands;
 
@@ -55,22 +53,19 @@ struct Instruction {
   }
   std::int32_t getOperandCount() { return m_operands.size(); }
 
-  std::string getOPCode() {
-    return opcode_map[m_instr_name];
-  }
-
+  std::string getOPCode() { return opcode_map[m_instr_name]; }
 
  private:
-    std::vector<std::string_view> getInstructionComponents() {
-         std::vector<std::string_view> instruction_components;
-         instruction_components =
-             m_raw_instr | ranges::view::split( ' ' ) |
-             ranges::view::transform( []( auto&& component ) {
-               return std::string_view( &*component.begin(),
-                                        ranges::distance( component ) );
-             } ) |
-             ranges::to_vector;
-      return instruction_components;
+  std::vector<std::string_view> getInstructionComponents() {
+    std::vector<std::string_view> instruction_components;
+    instruction_components =
+        m_raw_instr | ranges::view::split( ' ' ) |
+        ranges::view::transform( []( auto&& component ) {
+          return std::string_view( &*component.begin(),
+                                   ranges::distance( component ) );
+        } ) |
+        ranges::to_vector;
+    return instruction_components;
   }
 
   void parseInstruction() {
@@ -147,7 +142,7 @@ BOOST_AUTO_TEST_CASE( get_opcode_1 ) {
   BOOST_REQUIRE_EQUAL( test_instr.getOPCode(), "1100110{}000{}{}0000010" );
 }
 BOOST_AUTO_TEST_CASE( get_opcode_2 ) {
-  Instruction test_instr( "addi r1 r2 imm" );
+  Instruction test_instr( "addi r1 r2 r3" );
 
   BOOST_REQUIRE_EQUAL( test_instr.getOPCode(), "1100100{}000{}{}" );
 }
