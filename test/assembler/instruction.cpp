@@ -1,3 +1,5 @@
+#include <cstdint>
+#include <unordered_map>
 #define BOOST_TEST_MODULE assembler_test
 
 #include <assembler/immediate.hpp>
@@ -40,6 +42,12 @@ struct Instruction {
       { "sll", "1100110{}100{}{}0000000" },
       { "sra", "1100110{}101{}{}0000010" } };
 
+  std::unordered_map<std::string, std::int32_t> m_immediate_length_map{
+      { "addi", 12 }, { "lui", 20 }, { "lw", 12 }, { "sw", 7 },  { "jalr", 12 },
+      { "jal", 12 },  { "beq", 7 },  { "bne", 7 }, { "blt", 7 }, { "bge", 7 },
+
+  };
+
   std::vector<std::shared_ptr<assembler::Operand>> m_operands;
 
  public:
@@ -54,7 +62,7 @@ struct Instruction {
   }
   std::int32_t getOperandCount() { return m_operands.size(); }
 
-  std::string getOPCode() { return opcode_map[m_instr_name]; }
+  std::string getOPCode() { return m_opcode_map[m_instr_name]; }
 
  private:
   std::vector<std::string_view> getInstructionComponents() {
@@ -95,8 +103,9 @@ struct Instruction {
           m_operands.emplace_back( new Label( component ) );
           break;
         case Operand::OperandType::ImmediateOp:
-          m_operands.emplace_back(
-              new Immediate( std::stoll( std::string( component ) ), 12 ) );
+          m_operands.emplace_back( new Immediate(
+              std::stoll( std::string( component ) ),
+              m_immediate_length_map[std::string( component )] ) );
       }
     }
   }
