@@ -24,7 +24,7 @@ struct Immediate : Operand {
   std::string getBinaryValue() override {
     binary_value = m_value;
     return binary_value.to_string() |
-           ranges::action::drop( 64 - m_operand_length );
+           ranges::actions::drop( 64 - m_operand_length );
   }
 };
 }  // namespace assembler

@@ -59,8 +59,8 @@ struct Instruction {
   std::vector<std::string_view> getInstructionComponents() {
     std::vector<std::string_view> instruction_components;
     instruction_components =
-        m_raw_instr | ranges::view::split( ' ' ) |
-        ranges::view::transform( []( auto&& component ) {
+        m_raw_instr | ranges::views::split( ' ' ) |
+        ranges::views::transform( []( auto&& component ) {
           return std::string_view( &*component.begin(),
                                    ranges::distance( component ) );
         } ) |
