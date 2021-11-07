@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <range/v3/all.hpp>
 #include <string>
+#include <string_view>
 
 namespace assembler {
 struct Label : Operand {
@@ -13,7 +14,7 @@ struct Label : Operand {
   std::string m_label_name;
 
  public:
-  Label( const std::string& label_name ) : m_label_name( label_name ) {}
+  Label( const std::string_view& label_name ) : m_label_name( label_name ) {}
   std::string getName() { return m_label_name; }
   void setAddress( std::int32_t address ) { m_address = address; }
   std::string getAddress() {

@@ -1,6 +1,7 @@
 #define BOOST_TEST_MODULE assembler_test
 
 #include <assembler/immediate.hpp>
+#include <assembler/label.hpp>
 #include <assembler/operand.hpp>
 #include <assembler/register.hpp>
 #include <boost/test/unit_test.hpp>
@@ -90,9 +91,10 @@ struct Instruction {
         case Operand::OperandType::RegisterOp:
           m_operands.emplace_back( new Register( component ) );
           break;
+        case Operand::OperandType::LabelOp:
+          m_operands.emplace_back( new Label( component ) );
+          break;
         case Operand::OperandType::ImmediateOp:
-          // TODO: Operand length must be passed as per instruction ( Bits are
-          // based on instr)
           m_operands.emplace_back(
               new Immediate( std::stoll( std::string( component ) ), 12 ) );
       }
