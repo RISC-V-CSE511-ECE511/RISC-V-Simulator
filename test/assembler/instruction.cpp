@@ -19,9 +19,8 @@
 #include <string>
 #include <string_view>
 
-// To be added in operand class
 using namespace assembler;
-
+namespace assembler {
 struct Instruction {
  private:
   std::string_view m_label_name;
@@ -180,11 +179,15 @@ struct Instruction {
     std::string binary_encoding;
     std::string op1( static_cast<RegisterDispOp*>( getOperand( 1 ).get() )
                          ->getDisplacementBinary() );
-    std::string op1_part1( op1.begin(), op1.begin() + 6 );
-    std::string op1_part2( op1.begin() + 6, op1.end() );
+    std::string op1_part1( op1.begin(), op1.begin() + 5 );
+    std::string op1_part2( op1.begin() + 5, op1.end() );
+
+    std::string register_binary =
+        static_cast<RegisterDispOp*>( getOperand( 1 ).get() )
+            ->getRegisterBinary();
     binary_encoding =
-        fmt::format( m_opcode_map[m_instr_name],
-                     getOperand( 0 )->getBinaryValue(), op1_part1, op1_part2 );
+        fmt::format( m_opcode_map[m_instr_name], op1_part1, register_binary,
+                     getOperand( 0 )->getBinaryValue(), op1_part2 );
     return binary_encoding;
   }
 
@@ -202,7 +205,6 @@ struct Instruction {
   std::string encodeBranch() {
     std::string binary_encoding;
     std::string offset = getOperand( 2 )->getBinaryValue();
-    fmt::print( offset );
 
     binary_encoding = fmt::format(
         m_opcode_map[m_instr_name],
@@ -214,7 +216,7 @@ struct Instruction {
     return result;
   }
 };
-
+}  // namespace assembler
 BOOST_AUTO_TEST_SUITE( instruction_methods )
 
 BOOST_AUTO_TEST_CASE( get_name ) {
@@ -341,6 +343,20 @@ BOOST_AUTO_TEST_CASE( bge_test ) {
 
   BOOST_REQUIRE_EQUAL( test_instr.getBinaryEncoding(),
                        "00000000001000001101001001100011" );
+}
+
+BOOST_AUTO_TEST_CASE( lw_test ) {
+  Instruction test_instr( "lw r1 8(r2)" );
+
+  BOOST_REQUIRE_EQUAL( test_instr.getBinaryEncoding(),
+                       "00000000100000010010000010000011" );
+}
+
+BOOST_AUTO_TEST_CASE( sw_test ) {
+  Instruction test_instr( "sw r1 8(r2)" );
+
+  BOOST_REQUIRE_EQUAL( test_instr.getBinaryEncoding(),
+                       "00000000000100010010010000100011" );
 }
 
 BOOST_AUTO_TEST_SUITE_END()
