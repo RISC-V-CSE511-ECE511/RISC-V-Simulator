@@ -21,7 +21,7 @@ struct Instruction {
   std::string m_raw_instr;
   std::string m_instr_name;
   std::string m_opcode;
-  std::unordered_map<std::string, std::string> opcode_map{
+  std::unordered_map<std::string, std::string> m_opcode_map{
       { "addi", "1100100{}000{}{}" },
       { "sub", "1100110{}000{}{}0000010" },
       { "add", "1100110{}000{}{}0000000" },
