@@ -23,8 +23,10 @@ struct Immediate : Operand {
 
   std::string getBinaryValue() override {
     binary_value = m_value;
-    return binary_value.to_string() |
-           ranges::actions::drop( 64 - m_operand_length );
+    std::string result = binary_value.to_string() |
+                         ranges::actions::drop( 64 - m_operand_length );
+    std::reverse( result.begin(), result.end() );
+    return result;
   }
 };
 }  // namespace assembler

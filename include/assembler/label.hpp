@@ -1,3 +1,4 @@
+#include <algorithm>
 #include <assembler/operand.hpp>
 #include <cstddef>
 #include <cstdint>
@@ -31,9 +32,12 @@ struct Label : Operand {
 
   std::string getBinaryValue() override {
     binary_value = m_address;
-    return m_address != 0 ? binary_value.to_string() |
-                                ranges::actions::drop( 64 - m_operand_length )
-                          : "";
+    std::string result =
+        m_address != 0 ? binary_value.to_string() |
+                             ranges::actions::drop( 64 - m_operand_length )
+                       : "";
+    std::reverse( result.begin(), result.end() );
+    return result;
   }
 };
 }  // namespace assembler

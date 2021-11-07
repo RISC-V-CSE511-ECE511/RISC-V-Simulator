@@ -16,10 +16,7 @@ struct RegisterDispOp : Operand {
     parseOperand();
   }
   std::string getBinaryValue() override {
-    std::string register_binary = Register( m_register_name ).getBinaryValue();
-    std::string displacement_binary =
-        Immediate( m_displacement, 12 ).getBinaryValue();
-    return displacement_binary + register_binary;
+    return "";  // Not useful here
   }
 
   std::string getRegisterBinary() {

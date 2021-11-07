@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include <bitset>
 #include <string>
 
@@ -14,7 +15,10 @@ struct Register : Operand {
   Register( const std::string_view reg_name ) : m_register_name( reg_name ) {}
   std::string getBinaryValue() override {
     std::string_view str( m_register_name.begin() + 1, m_register_name.end() );
-    return std::bitset<5>( std::stoll( str.data() ) ).to_string();
+
+    std::string result = std::bitset<5>( std::stoll( str.data() ) ).to_string();
+    std::reverse( result.begin(), result.end() );
+    return result;
   }
   std::string getName() { return m_register_name; }
 };
