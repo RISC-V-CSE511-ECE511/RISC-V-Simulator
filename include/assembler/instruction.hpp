@@ -60,6 +60,8 @@ struct Instruction {
   }
   std::int32_t getOperandCount() { return m_operands.size(); }
 
+  bool hasLabel() { return !m_label_name.empty(); }
+
   std::string getOPCode() { return m_opcode_map[m_instr_name]; }
 
   std::string getBinaryEncoding() {
