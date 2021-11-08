@@ -58,6 +58,9 @@ struct Instruction {
   std::shared_ptr<assembler::Operand> getOperand( int index ) {
     return m_operands.at( index );
   }
+  std::vector<std::shared_ptr<assembler::Operand>> getOperands() {
+    return m_operands;
+  }
   std::int32_t getOperandCount() { return m_operands.size(); }
 
   bool hasLabel() { return !m_label_name.empty(); }
