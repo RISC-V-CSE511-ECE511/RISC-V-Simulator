@@ -13,6 +13,8 @@ struct Register : Operand {
 
  public:
   Register( const std::string_view reg_name ) : m_register_name( reg_name ) {}
+
+  OperandType getOperandType() override { return OperandType::RegisterOp; }
   std::string getBinaryValue() override {
     std::string_view str( m_register_name.begin() + 1, m_register_name.end() );
 

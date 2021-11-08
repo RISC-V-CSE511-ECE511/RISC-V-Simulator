@@ -30,6 +30,8 @@ struct Label : Operand {
     m_operand_length = operand_length;
   }
 
+  OperandType getOperandType() override { return OperandType::LabelOp; }
+
   std::string getBinaryValue() override {
     binary_value = m_address;
     std::string result =

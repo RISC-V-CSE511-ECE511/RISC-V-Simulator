@@ -12,6 +12,7 @@ struct Operand {
            : operand.find( '(' ) == std::string::npos ? ImmediateOp
                                                       : RegisterDisplacementOp;
   }
+  virtual OperandType getOperandType() = 0;
   virtual std::string getBinaryValue() = 0;
   virtual ~Operand(){};
 };

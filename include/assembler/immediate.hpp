@@ -21,6 +21,8 @@ struct Immediate : Operand {
 
   std::int32_t getOperandLength() { return m_operand_length; }
 
+  OperandType getOperandType() override { return OperandType::ImmediateOp; }
+
   std::string getBinaryValue() override {
     binary_value = m_value;
     std::string result = binary_value.to_string() |

@@ -15,6 +15,10 @@ struct RegisterDispOp : Operand {
   RegisterDispOp( const std::string_view operand ) : m_operand( operand ) {
     parseOperand();
   }
+
+  OperandType getOperandType() override {
+    return OperandType::RegisterDisplacementOp;
+  }
   std::string getBinaryValue() override {
     return "";  // Not useful here
   }
