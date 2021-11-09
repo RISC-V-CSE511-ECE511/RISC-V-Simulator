@@ -1,0 +1,61 @@
+#pragma once
+
+#include <string>
+#include <unordered_map>
+
+namespace cpu {
+struct UJInstr {
+  inline static std::unordered_map<std::string, std::string> m_uncode_instr_map{
+      { "1110011", "jalr" }, { "1111011", "jal" } };
+
+  static std::string getInstructionName( const std::string& instruction ) {
+    std::string unique_code( instruction.rbegin(), instruction.rbegin() + 7 );
+    return m_uncode_instr_map[unique_code];
+  }
+  static std::int32_t getOperand1( const std::string& instruction ) {
+    std::string rd( instruction.rbegin() + 7, instruction.rbegin() + 12 );
+    std::reverse( rd.begin(), rd.end() );
+    return std::stoi( rd, nullptr, 2 );
+  }
+
+  static std::int32_t getOperand2( const std::string& instruction ) {
+    if ( getInstructionName( instruction ) == "jalr" ) {
+      std::string op1( instruction.rbegin() + 15, instruction.rbegin() + 20 );
+      std::reverse( op1.begin(), op1.end() );
+      return std::stoi( op1, nullptr, 2 );
+    } else {
+      std::string immediate_value;
+      immediate_value.push_back( *( instruction.rbegin() + 31 ) );  // 31st bit
+
+      std::string tmp1( instruction.rbegin() + 12,
+                        instruction.rbegin() + 20 );  // [12-19]
+      std::reverse( tmp1.begin(), tmp1.end() );       //[19-12]
+
+      immediate_value += tmp1;
+
+      immediate_value.push_back( *( instruction.rbegin() + 20 ) );  // 11th bit
+
+      std::string tmp2( instruction.rbegin() + 21,
+                        instruction.rbegin() + 31 );  // [1:10]
+      std::reverse( tmp2.begin(), tmp2.end() );       //[10:1]
+
+      immediate_value += tmp2;
+
+      immediate_value.push_back( '0' );  // Trailing 0
+
+      return std::stoi( immediate_value, nullptr, 2 );
+    }
+  }
+  static std::int32_t getOperand3( const std::string& instruction ) {
+    if ( getInstructionName( instruction ) == "jalr" ) {
+      std::string immediate_value( instruction.rbegin() + 20,
+                                   instruction.rbegin() + 32 );        // [0:11]
+      std::reverse( immediate_value.begin(), immediate_value.end() );  // [11:0]
+      return std::stoi( immediate_value, nullptr, 2 );
+
+    } else {
+      return std::numeric_limits<std::int32_t>::max();
+    }
+  }
+};
+}  // namespace cpu

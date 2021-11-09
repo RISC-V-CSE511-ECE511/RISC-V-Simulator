@@ -23,7 +23,7 @@ struct Instruction {
   std::string m_instr_name;
   std::string m_opcode;
   std::unordered_map<std::string, std::string> m_opcode_map{
-
+      /*R Type*/
       { "add", "0000000{}{}000{}0110011" },
       { "sub", "0100000{}{}000{}0110011" },
       { "xor", "0000000{}{}100{}0110011" },
@@ -32,19 +32,24 @@ struct Instruction {
       { "sll", "0000000{}{}001{}0110011" },
       { "sra", "0100000{}{}101{}0110011" },
 
+      /*I Type*/
       { "addi", "{}{}000{}0010011" },
       { "lw", "{}{}010{}0000011" },
 
+      /*S*/
       { "sw", "{}{}{}010{}0100011" },
 
+      /*UJ*/
       { "jal", "{}{}{}1101111" },
       { "jalr", "{}{}000{}1100111" },
 
+      /*SB*/
       { "blt", "{}{}{}100{}1100011" },
       { "bge", "{}{}{}101{}1100011" },
       { "beq", "{}{}{}000{}1100011" },
       { "bne", "{}{}{}001{}1100011" },
 
+      /*U*/
       { "lui", "{}{}0110111" } };
 
   std::unordered_map<std::string, std::int32_t> m_immediate_length_map{
