@@ -213,47 +213,6 @@ struct Instruction {
     return encoded_string;
   }
 
-  // std::string getBinaryEncoding() {
-  //   std::string binary_encoding;
-  //   switch ( getOperandCount() ) {
-  //     case 2:
-  //       if ( isLoadInstruction( m_instr_name ) ) {
-  //         binary_encoding = encodeLoad();
-  //       } else if ( isStoreInstruction( m_instr_name ) ) {
-  //         binary_encoding = encodeStore();
-  //       } else if ( m_instr_name == "jal" ) {
-  //         binary_encoding = encodeJal();
-  //       } else {
-  //         binary_encoding = fmt::format( m_opcode_map[m_instr_name],
-  //                                        getOperand( 0 )->getBinaryValue(),
-  //                                        getOperand( 1 )->getBinaryValue() );
-  //       }
-  //       break;
-  //     case 3:
-
-  //       if ( isBranchInstruction( m_instr_name ) ) {
-  //         binary_encoding = encodeBranch();
-  //       } else {
-  //         binary_encoding = fmt::format( m_opcode_map[m_instr_name],
-  //                                        getOperand( 0 )->getBinaryValue(),
-  //                                        getOperand( 1 )->getBinaryValue(),
-  //                                        getOperand( 2 )->getBinaryValue() );
-  //       }
-  //       break;
-  //     case 4:
-  //       binary_encoding = fmt::format( m_opcode_map[m_instr_name],
-  //                                      getOperand( 0 )->getBinaryValue(),
-  //                                      getOperand( 1 )->getBinaryValue(),
-  //                                      getOperand( 2 )->getBinaryValue(),
-  //                                      getOperand( 3 )->getBinaryValue() );
-  //       break;
-  //   }
-
-  //   std::string result = binary_encoding;
-  //   std::reverse( result.begin(), result.end() );
-  //   return result;
-  // }
-
  private:
   std::vector<std::string_view> getInstructionComponents() {
     std::vector<std::string_view> instruction_components;
@@ -326,79 +285,5 @@ struct Instruction {
   bool isJalInstruction( const std::string_view instr_name ) {
     return instr_name == "jal";
   }
-
-  // std::string encodeStore() {
-  //   std::string binary_encoding;
-  //   std::string op1( static_cast<RegisterDispOp*>( getOperand( 1 ).get() )
-  //                        ->getDisplacementBinary() );
-  //   std::string op1_part1( op1.begin(), op1.begin() + 5 );
-  //   std::string op1_part2( op1.begin() + 5, op1.end() );
-
-  //   std::string register_binary =
-  //       static_cast<RegisterDispOp*>( getOperand( 1 ).get() )
-  //           ->getRegisterBinary();
-  //   binary_encoding =
-  //       fmt::format( m_opcode_map[m_instr_name], op1_part1, register_binary,
-  //                    getOperand( 0 )->getBinaryValue(), op1_part2 );
-  //   return binary_encoding;
-  // }
-
-  // std::string encodeLoad() {
-  //   std::string binary_encoding;
-  //   binary_encoding = fmt::format(
-  //       m_opcode_map[m_instr_name], getOperand( 0 )->getBinaryValue(),
-  //       static_cast<RegisterDispOp*>( getOperand( 1 ).get() )
-  //           ->getRegisterBinary(),
-  //       static_cast<RegisterDispOp*>( getOperand( 1 ).get() )
-  //           ->getDisplacementBinary() );
-  //   return binary_encoding;
-  // }
-
-  // std::string encodeBranch() {
-  //   std::string binary_encoding;
-  //   std::string offset = getOperand( 2 )->getBinaryValue();
-
-  //   std::string offset_p1;
-  //   offset_p1.push_back( offset[10] );
-  //   std::string tmp = std::string( offset.begin(), offset.begin() + 4 );
-  //   std::reverse( tmp.begin(), tmp.end() );
-  //   offset_p1 += tmp;
-
-  //   std::string offset_p2;
-  //   std::string tmp2 = std::string( offset.begin() + 4, offset.begin() + 10
-  //   ); std::reverse( tmp2.begin(), tmp2.end() ); offset_p2 += tmp2;
-  //   offset_p2.push_back( offset[11] );
-
-  //   binary_encoding =
-  //       fmt::format( m_opcode_map[m_instr_name], offset_p1,
-  //                    getOperand( 0 )->getBinaryValue(),
-  //                    getOperand( 1 )->getBinaryValue(), offset_p2 );
-
-  //   std::string result = binary_encoding;
-  //   return result;
-  // }
-
-  // std::string encodeJal() {
-  //   std::string binary_encoding;
-  //   std::string offset = getOperand( 1 )->getBinaryValue();
-
-  //   std::string offset_p1;
-  //   std::string tmp( offset.begin() + 11, offset.end() - 1 );
-  //   std::reverse( tmp.begin(), tmp.end() );
-  //   offset_p1 += tmp;
-
-  //   std::string offset_p2;
-  //   offset_p2.push_back( offset[10] );
-  //   std::string tmp2( offset.begin(), offset.end() + 10 );
-  //   std::reverse( tmp.begin(), tmp.end() );
-  //   offset_p2 += tmp2;
-  //   offset_p2.push_back( offset[19] );
-
-  //   binary_encoding =
-  //       fmt::format( m_opcode_map[m_instr_name],
-  //                    getOperand( 0 )->getBinaryValue(), offset_p1, offset_p2
-  //                    );
-  //   return binary_encoding;
-  // }
 };
 }  // namespace assembler
