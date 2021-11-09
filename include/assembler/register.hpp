@@ -19,7 +19,7 @@ struct Register : Operand {
     std::string_view str( m_register_name.begin() + 1, m_register_name.end() );
 
     std::string result = std::bitset<5>( std::stoll( str.data() ) ).to_string();
-    std::reverse( result.begin(), result.end() );
+    // std::reverse( result.begin(), result.end() );
     return result;
   }
   std::string getName() { return m_register_name; }

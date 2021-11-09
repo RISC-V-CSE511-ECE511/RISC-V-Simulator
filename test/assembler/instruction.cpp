@@ -33,21 +33,6 @@ BOOST_AUTO_TEST_CASE( get_operand_count ) {
 
   BOOST_REQUIRE_EQUAL( test_instr.getOperandCount(), 3 );
 }
-BOOST_AUTO_TEST_CASE( get_opcode_1 ) {
-  Instruction test_instr( "sub r1 r2 r3" );
-
-  BOOST_REQUIRE_EQUAL( test_instr.getOPCode(), "1100110{}000{}{}0000010" );
-}
-BOOST_AUTO_TEST_CASE( get_opcode_2 ) {
-  Instruction test_instr( "addi r1 r2 r3" );
-
-  BOOST_REQUIRE_EQUAL( test_instr.getOPCode(), "1100100{}000{}{}" );
-}
-BOOST_AUTO_TEST_CASE( get_opcode_3 ) {
-  Instruction test_instr( "xor r1 r2 r3" );
-
-  BOOST_REQUIRE_EQUAL( test_instr.getOPCode(), "1100110{}001{}{}0000000" );
-}
 
 BOOST_AUTO_TEST_CASE( get_binary_encoding_2_operand ) {
   Instruction test_instr( "lui r3 1024" );
@@ -145,6 +130,20 @@ BOOST_AUTO_TEST_CASE( sw_test ) {
 
   BOOST_REQUIRE_EQUAL( test_instr.getBinaryEncoding(),
                        "00000000000100010010010000100011" );
+}
+
+BOOST_AUTO_TEST_CASE( jal_test ) {
+  Instruction test_instr( "jal r1 4" );
+
+  BOOST_REQUIRE_EQUAL( test_instr.getBinaryEncoding(),
+                       "00000000010000000000000011101111" );
+}
+
+BOOST_AUTO_TEST_CASE( sub_test_2 ) {
+  Instruction test_instr( "sub r29 r30 r31" );
+
+  BOOST_REQUIRE_EQUAL( test_instr.getBinaryEncoding(),
+                       "01000001111111110000111010110011" );
 }
 
 BOOST_AUTO_TEST_SUITE_END()

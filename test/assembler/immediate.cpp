@@ -22,7 +22,7 @@ BOOST_AUTO_TEST_CASE( get_operand_length ) {
 BOOST_AUTO_TEST_CASE( get_binary_value ) {
   Immediate test_operand( 5, 20 );
 
-  BOOST_REQUIRE_EQUAL( test_operand.getBinaryValue(), "10100000000000000000" );
+  BOOST_REQUIRE_EQUAL( test_operand.getBinaryValue(), "00000000000000000101" );
 }
 
 BOOST_AUTO_TEST_SUITE_END()

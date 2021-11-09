@@ -45,7 +45,7 @@ BOOST_AUTO_TEST_CASE( label_getBinaryValue_positive ) {
   operand.setOperandLength( 7 );
   operand.setAddress( 63 );
 
-  BOOST_REQUIRE_EQUAL( operand.getBinaryValue(), "1111110" );
+  BOOST_REQUIRE_EQUAL( operand.getBinaryValue(), "0111111" );
 }
 
 BOOST_AUTO_TEST_SUITE_END()

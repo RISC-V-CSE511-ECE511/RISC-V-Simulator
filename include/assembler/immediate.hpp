@@ -27,7 +27,7 @@ struct Immediate : Operand {
     binary_value = m_value;
     std::string result = binary_value.to_string() |
                          ranges::actions::drop( 64 - m_operand_length );
-    std::reverse( result.begin(), result.end() );
+    // std::reverse( result.begin(), result.end() );
     return result;
   }
 };
