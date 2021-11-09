@@ -25,7 +25,9 @@ struct Decoder {
  public:
   static ConnectionInfo decode( const std::string& instruction ) {
     InstructionType instr_type = getType( instruction );
-    ConnectionInfo info{ instr_type, getOperand1( instruction, instr_type ),
+    ConnectionInfo info{ instr_type,
+                         getInstructionName( instruction, instr_type ),
+                         getOperand1( instruction, instr_type ),
                          getOperand2( instruction, instr_type ),
                          getOperand3( instruction, instr_type ) };
     return info;
