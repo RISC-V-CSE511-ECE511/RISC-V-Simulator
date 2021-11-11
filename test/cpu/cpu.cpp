@@ -174,6 +174,30 @@ struct Executor {
     storeToMemory( rs2, sys_state.memory, rs1 + offset );
   }
 
+  static void jalr_func( State& sys_state, const ConnectionInfo& conn_info ) {
+    int* rf = sys_state.register_file;
+
+    std::int32_t& rd = rf[conn_info.operand1];
+    std::int32_t rs1 = rf[conn_info.operand2];
+    std::int32_t offset = sext( conn_info.operand3, 12 );
+
+    std::int t = sys_state.PC;
+    sys_state.PC = rs1 + sext(translateAddress(offset));
+    rd = sys_state.PC;
+  }
+
+    static void jal_func( State& sys_state, const ConnectionInfo& conn_info ) {
+    int* rf = sys_state.register_file;
+
+    std::int32_t& rd = rf[conn_info.operand1];
+    std::int32_t offset =
+        sext( translateAddress( rf[conn_info.operand2] ), 12 );
+
+    rd = sys_state.PC;  // Already updated by fetch
+
+    sys_state.PC += offset;
+  }
+
   static std::int32_t loadFromMemory( const std::string& mem,
                                       std::int32_t address,
                                       std::int32_t num_bytes_to_read ) {
@@ -202,38 +226,40 @@ struct Executor {
   static inline std::unordered_map<
       std::string, std::function<void( State&, const ConnectionInfo& )>>
       m_instr_func_map{
-          { "add", std::bind( &add_func, std::placeholders::_1,
-                              std::placeholders::_2 ) },
-          { "sub", std::bind( &sub_func, std::placeholders::_1,
-                              std::placeholders::_2 ) },
-          { "xor", std::bind( &xor_func, std::placeholders::_1,
-                              std::placeholders::_2 ) },
-          { "and", std::bind( &and_func, std::placeholders::_1,
-                              std::placeholders::_2 ) },
-          { "or", std::bind( &or_func, std::placeholders::_1,
-                             std::placeholders::_2 ) },
-          { "sll", std::bind( &sll_func, std::placeholders::_1,
-                              std::placeholders::_2 ) },
-          { "sra", std::bind( &sra_func, std::placeholders::_1,
-                              std::placeholders::_2 ) },
-          { "beq", std::bind( &beq_func, std::placeholders::_1,
-                              std::placeholders::_2 ) },
-          { "blt", std::bind( &blt_func, std::placeholders::_1,
-                              std::placeholders::_2 ) },
-          { "bge", std::bind( &bge_func, std::placeholders::_1,
-                              std::placeholders::_2 ) },
-          { "bne", std::bind( &bne_func, std::placeholders::_1,
-                              std::placeholders::_2 ) },
-          { "lui", std::bind( &lui_func, std::placeholders::_1,
-                              std::placeholders::_2 ) },
-          { "addi", std::bind( &addi_func, std::placeholders::_1,
-                               std::placeholders::_2 ) },
-          { "lw", std::bind( &lw_func, std::placeholders::_1,
-                             std::placeholders::_2 ) },
-          { "sw", std::bind( &sw_func, std::placeholders::_1,
-                             std::placeholders::_2 ) },
-      };
-};
+                        { "add", std::bind( &add_func, std::placeholders::_1,
+                                            std::placeholders::_2 ) },
+                        { "sub", std::bind( &sub_func, std::placeholders::_1,
+                                            std::placeholders::_2 ) },
+                        { "xor", std::bind( &xor_func, std::placeholders::_1,
+                                            std::placeholders::_2 ) },
+                        { "and", std::bind( &and_func, std::placeholders::_1,
+                                            std::placeholders::_2 ) },
+                        { "or", std::bind( &or_func, std::placeholders::_1,
+                                           std::placeholders::_2 ) },
+                        { "sll", std::bind( &sll_func, std::placeholders::_1,
+                                            std::placeholders::_2 ) },
+                        { "sra", std::bind( &sra_func, std::placeholders::_1,
+                                            std::placeholders::_2 ) },
+                        { "addi", std::bind( &addi_func, std::placeholders::_1,
+                                            std::placeholders::_2 ) },
+                        { "lw", std::bind( &lw_func, std::placeholders::_1,
+                                            std::placeholders::_2 ) },
+                        { "sw", std::bind( &sw_func, std::placeholders::_1,
+                                            std::placeholders::_2 ) },
+                        { "jalr", std::bind( &jalr_func, std::placeholders::_1,
+                                            std::placeholders::_2 ) },
+                        { "jal", std::bind( &jal_func, std::placeholders::_1,
+                                           std::placeholders::_2 ) },
+                        { "beq", std::bind( &beq_func, std::placeholders::_1,
+                                            std::placeholders::_2 ) },
+                        { "bne", std::bind( &bne_func, std::placeholders::_1,
+                                            std::placeholders::_2 ) },    
+                        { "blt", std::bind( &blt_func, std::placeholders::_1,
+                                            std::placeholders::_2 ) },
+                        { "bge", std::bind( &bge_func, std::placeholders::_1,
+                                            std::placeholders::_2 ) },
+                        { "lui", std::bind( &lui_func, std::placeholders::_1,
+                                            std::placeholders::_2 ) } };                                                 
 
 struct CPU {
  private:
