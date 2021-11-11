@@ -63,15 +63,17 @@ struct turbo_asm {
   }
 
   void resolveLabels() {
+    std::int32_t current_instruction_loc = 0;
     for ( auto& instruction : m_instructions ) {
       for ( auto operand : instruction.getOperands() ) {
         if ( operand->getOperandType() == Operand::OperandType::LabelOp ) {
           Label* label_operand = (Label*)operand.get();
           label_operand->setAddress(
-              m_label_adr_map[label_operand->getName()] );
+              m_label_adr_map[label_operand->getName()] - current_instruction_loc );
           label_operand->setOperandLength( 12 );
         }
       }
+      current_instruction_loc += 4;
     }
   }
   std::string readFile( const std::string& filename ) {
