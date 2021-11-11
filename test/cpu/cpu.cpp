@@ -163,6 +163,17 @@ struct Executor {
     rd = sext( loadFromMemory( sys_state.memory, rs1 + offset, 4 ), 32 );
   }
 
+  // S Type
+  static void sw_func( State& sys_state, const ConnectionInfo& conn_info ) {
+    int* rf = sys_state.register_file;
+
+    std::int32_t rs2 = rf[conn_info.operand1];
+    std::int32_t rs1 = rf[conn_info.operand2];
+    std::int32_t offset = sext( conn_info.operand3, 12 );
+
+    storeToMemory( rs2, sys_state.memory, rs1 + offset );
+  }
+
   static std::int32_t loadFromMemory( const std::string& mem,
                                       std::int32_t address,
                                       std::int32_t num_bytes_to_read ) {
@@ -175,9 +186,9 @@ struct Executor {
 
   static void storeToMemory( std::int32_t value, std::string& mem,
                              std::int32_t address ) {
-    std::int32_t actual_address = address * 32;
+    std::int32_t actual_address = address * 8;
     std::string binary_value = std::bitset<32>( value ).to_string();
-
+    std::reverse( binary_value.begin(), binary_value.end() );
     std::copy( binary_value.begin(), binary_value.end(),
                mem.begin() + actual_address );
   }
@@ -218,6 +229,8 @@ struct Executor {
           { "addi", std::bind( &addi_func, std::placeholders::_1,
                                std::placeholders::_2 ) },
           { "lw", std::bind( &lw_func, std::placeholders::_1,
+                             std::placeholders::_2 ) },
+          { "sw", std::bind( &sw_func, std::placeholders::_1,
                              std::placeholders::_2 ) },
       };
 };
@@ -522,6 +535,22 @@ BOOST_AUTO_TEST_CASE( lw_test ) {
   test_cpu.runProgram( binary );
 
   BOOST_REQUIRE_EQUAL( rf[1], 1024 );
+}
+
+BOOST_AUTO_TEST_CASE( sw_test ) {
+  CPU test_cpu;
+
+  assembler::turbo_asm engine( get_examples_dir() + "cpu_sample8.s" );
+  std::string binary = engine.dumpBinary();
+
+  int* rf = test_cpu.getSystemState().register_file;
+
+  rf[1] = 50;
+  rf[2] = 8;
+
+  test_cpu.runProgram( binary );
+
+  BOOST_REQUIRE_EQUAL( rf[3], 50 );
 }
 
 BOOST_AUTO_TEST_SUITE_END()
