@@ -18,7 +18,7 @@ namespace cpu {
 struct Decoder {
  private:
   inline static std::unordered_map<std::string, InstructionType> m_type_map{
-      { "1100110", InstructionType::R }, { "1100000", InstructionType::I },
+      { "1100110", InstructionType::R }, { "1100100", InstructionType::I },
       { "1100010", InstructionType::S }, { "1100011", InstructionType::SB },
       { "1110110", InstructionType::U }, { "1111011", InstructionType::UJ } };
 
