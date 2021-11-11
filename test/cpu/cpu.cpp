@@ -5,7 +5,9 @@
 #include "cpu/decoder/connection_info.hpp"
 #define BOOST_TEST_MODULE cpu_test
 
+#include <algorithm>
 #include <assembler/assembler.hpp>
+#include <bitset>
 #include <boost/test/unit_test.hpp>
 #include <cpu/decoder/decoder.hpp>
 #include <string>
@@ -19,6 +21,7 @@ struct State {
                                      0, 0, 0, 0, 0, 0, 0, 0, 0 };
   std::int32_t PC = 0;
   std::string IR = "";
+  std::int32_t halt_adr;
 };
 
 struct Executor {
@@ -139,6 +142,46 @@ struct Executor {
     rd = sext( immediate, 32 );
   }
 
+  // I Type Support
+  static void addi_func( State& sys_state, const ConnectionInfo& conn_info ) {
+    int* rf = sys_state.register_file;
+
+    std::int32_t& rd = rf[conn_info.operand1];
+    std::int32_t rs1 = rf[conn_info.operand2];
+    std::int32_t immediate = sext( conn_info.operand3, 12 );
+
+    rd = rs1 + immediate;
+  }
+
+  static void lw_func( State& sys_state, const ConnectionInfo& conn_info ) {
+    int* rf = sys_state.register_file;
+
+    std::int32_t& rd = rf[conn_info.operand1];
+    std::int32_t rs1 = rf[conn_info.operand2];
+    std::int32_t offset = sext( conn_info.operand3, 12 );
+
+    rd = sext( loadFromMemory( sys_state.memory, rs1 + offset, 4 ), 32 );
+  }
+
+  static std::int32_t loadFromMemory( const std::string& mem,
+                                      std::int32_t address,
+                                      std::int32_t num_bytes_to_read ) {
+    std::int32_t actual_address = address * 8;
+    std::string val( mem.begin() + actual_address,
+                     mem.begin() + actual_address + ( num_bytes_to_read * 8 ) );
+    std::reverse( val.begin(), val.end() );
+    return std::stoi( val, nullptr, 2 );
+  }
+
+  static void storeToMemory( std::int32_t value, std::string& mem,
+                             std::int32_t address ) {
+    std::int32_t actual_address = address * 32;
+    std::string binary_value = std::bitset<32>( value ).to_string();
+
+    std::copy( binary_value.begin(), binary_value.end(),
+               mem.begin() + actual_address );
+  }
+
  public:  // API
   static void execute( State& sys_state, const ConnectionInfo& conn_info ) {
     m_instr_func_map[conn_info.instr_name]( sys_state, conn_info );
@@ -147,30 +190,36 @@ struct Executor {
  private:
   static inline std::unordered_map<
       std::string, std::function<void( State&, const ConnectionInfo& )>>
-      m_instr_func_map{ { "add", std::bind( &add_func, std::placeholders::_1,
-                                            std::placeholders::_2 ) },
-                        { "sub", std::bind( &sub_func, std::placeholders::_1,
-                                            std::placeholders::_2 ) },
-                        { "xor", std::bind( &xor_func, std::placeholders::_1,
-                                            std::placeholders::_2 ) },
-                        { "and", std::bind( &and_func, std::placeholders::_1,
-                                            std::placeholders::_2 ) },
-                        { "or", std::bind( &or_func, std::placeholders::_1,
-                                           std::placeholders::_2 ) },
-                        { "sll", std::bind( &sll_func, std::placeholders::_1,
-                                            std::placeholders::_2 ) },
-                        { "sra", std::bind( &sra_func, std::placeholders::_1,
-                                            std::placeholders::_2 ) },
-                        { "beq", std::bind( &beq_func, std::placeholders::_1,
-                                            std::placeholders::_2 ) },
-                        { "blt", std::bind( &blt_func, std::placeholders::_1,
-                                            std::placeholders::_2 ) },
-                        { "bge", std::bind( &bge_func, std::placeholders::_1,
-                                            std::placeholders::_2 ) },
-                        { "bne", std::bind( &bne_func, std::placeholders::_1,
-                                            std::placeholders::_2 ) },
-                        { "lui", std::bind( &lui_func, std::placeholders::_1,
-                                            std::placeholders::_2 ) } };
+      m_instr_func_map{
+          { "add", std::bind( &add_func, std::placeholders::_1,
+                              std::placeholders::_2 ) },
+          { "sub", std::bind( &sub_func, std::placeholders::_1,
+                              std::placeholders::_2 ) },
+          { "xor", std::bind( &xor_func, std::placeholders::_1,
+                              std::placeholders::_2 ) },
+          { "and", std::bind( &and_func, std::placeholders::_1,
+                              std::placeholders::_2 ) },
+          { "or", std::bind( &or_func, std::placeholders::_1,
+                             std::placeholders::_2 ) },
+          { "sll", std::bind( &sll_func, std::placeholders::_1,
+                              std::placeholders::_2 ) },
+          { "sra", std::bind( &sra_func, std::placeholders::_1,
+                              std::placeholders::_2 ) },
+          { "beq", std::bind( &beq_func, std::placeholders::_1,
+                              std::placeholders::_2 ) },
+          { "blt", std::bind( &blt_func, std::placeholders::_1,
+                              std::placeholders::_2 ) },
+          { "bge", std::bind( &bge_func, std::placeholders::_1,
+                              std::placeholders::_2 ) },
+          { "bne", std::bind( &bne_func, std::placeholders::_1,
+                              std::placeholders::_2 ) },
+          { "lui", std::bind( &lui_func, std::placeholders::_1,
+                              std::placeholders::_2 ) },
+          { "addi", std::bind( &addi_func, std::placeholders::_1,
+                               std::placeholders::_2 ) },
+          { "lw", std::bind( &lw_func, std::placeholders::_1,
+                             std::placeholders::_2 ) },
+      };
 };
 
 struct CPU {
@@ -178,10 +227,11 @@ struct CPU {
   State sys_state;
 
  public:
+  CPU() { initializeMemory( 1024 ); }
   void runProgram( const std::string& program ) {
     loadProgram( program );
     // Logic for this needs to be changed
-    while ( sys_state.PC != sys_state.memory.size() ) {
+    while ( sys_state.PC != sys_state.halt_adr ) {
       // fetch Instruction
       sys_state.IR = fetchInstruction();
       // Decode Instruction and Get Connection Information
@@ -200,7 +250,15 @@ struct CPU {
     return instruction;
   }
 
-  void loadProgram( const std::string& program ) { sys_state.memory = program; }
+  void loadProgram( const std::string& program ) {
+    std::copy( program.begin(), program.end(), sys_state.memory.begin() );
+    sys_state.halt_adr =
+        program.size();  // Will need to change for multiple program
+  }
+
+  void initializeMemory( std::int32_t mem_size ) {
+    sys_state.memory = std::string( mem_size, '0' );
+  }
 
   State& getSystemState() { return sys_state; }
 };
@@ -417,7 +475,7 @@ BOOST_AUTO_TEST_CASE( bne_test_true ) {
   BOOST_REQUIRE_EQUAL( rf[6], 2 );
 }
 
-// I
+// U
 BOOST_AUTO_TEST_CASE( lui_test ) {
   CPU test_cpu;
 
@@ -429,6 +487,41 @@ BOOST_AUTO_TEST_CASE( lui_test ) {
   test_cpu.runProgram( binary );
 
   BOOST_REQUIRE_EQUAL( rf[1], 4194304 );
+}
+
+// I Type
+BOOST_AUTO_TEST_CASE( addi_test ) {
+  CPU test_cpu;
+
+  assembler::turbo_asm engine( get_examples_dir() + "cpu_sample6.s" );
+  std::string binary = engine.dumpBinary();
+
+  int* rf = test_cpu.getSystemState().register_file;
+
+  test_cpu.runProgram( binary );
+
+  BOOST_REQUIRE_EQUAL( rf[1], 1024 );
+}
+
+BOOST_AUTO_TEST_CASE( lw_test ) {
+  CPU test_cpu;
+
+  assembler::turbo_asm engine( get_examples_dir() + "cpu_sample7.s" );
+  std::string binary = engine.dumpBinary();
+
+  std::int32_t test_value = 1024;
+  std::string value = std::bitset<32>( test_value ).to_string();
+  std::reverse( value.begin(), value.end() );
+  std::copy( value.begin(), value.end(),
+             test_cpu.getSystemState().memory.begin() + 32 );
+
+  int* rf = test_cpu.getSystemState().register_file;
+
+  rf[2] = 2;
+
+  test_cpu.runProgram( binary );
+
+  BOOST_REQUIRE_EQUAL( rf[1], 1024 );
 }
 
 BOOST_AUTO_TEST_SUITE_END()
