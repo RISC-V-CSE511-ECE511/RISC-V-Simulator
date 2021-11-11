@@ -19,5 +19,5 @@ The following extension must be installed in vscode for devcontainers to work.
 
 ### Additional Dependencies
 
-- fmt  `sudo apt-get install -y libfmt-dev `
+- fmt  `sudo apt-get install -y libfmt-dev`
 - ranges `sudo apt-get install -y libranges-v3-dev`
