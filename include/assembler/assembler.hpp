@@ -28,10 +28,8 @@ struct turbo_asm {
 
   void dumpBinary( const std::string& filename ) {
     std::fstream file( filename, std::fstream::out );
-    for ( auto& instruction : m_instructions ) {
-      std::string binary_encoding = instruction.getBinaryEncoding();
-      file << binary_encoding;
-    }
+    std::string result_binary = dumpBinary();
+    file << result_binary;
     file.close();
   }
 
