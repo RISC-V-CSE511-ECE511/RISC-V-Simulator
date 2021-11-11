@@ -50,6 +50,25 @@ struct Executor {
     rf[conn_info.operand1] = rf[conn_info.operand2] >> rf[conn_info.operand3];
   }
 
+  // SB Type
+  std::int32_t sext( const std::int32_t value,
+                     const std::int32_t msb_position ) {
+    std::int32_t result = value;
+
+    // Extract 20 bit value
+    std::int32_t msb_value = ( value & ( 1 << ( msb_position - 1 ) ) );
+
+    // Check if the 20 bit is 1
+    if ( msb_value ) {
+      // Mask out bits after msb as 1
+      std::int32_t mask = ( ~0 ) << msb_position;
+      // Apply the mask
+      result = result | mask;
+      return value;
+    }
+    return value;  // Same value is returned in case the msb is 0
+  }
+
  public:  // API
   static void execute( State& sys_state, const ConnectionInfo& conn_info ) {
     m_instr_func_map[conn_info.instr_name]( sys_state, conn_info );
