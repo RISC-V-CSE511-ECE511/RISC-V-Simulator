@@ -1,8 +1,11 @@
+#include <unistd.h>
+
 #include <functional>
 
 #include "cpu/decoder/connection_info.hpp"
 #define BOOST_TEST_MODULE cpu_test
 
+#include <assembler/assembler.hpp>
 #include <boost/test/unit_test.hpp>
 #include <cpu/decoder/decoder.hpp>
 #include <string>
@@ -51,8 +54,13 @@ struct Executor {
   }
 
   // SB Type
-  std::int32_t sext( const std::int32_t value,
-                     const std::int32_t msb_position ) {
+
+  static std::int32_t translateAddress( std::int32_t address ) {
+    return address * 8;
+  }
+
+  static std::int32_t sext( const std::int32_t value,
+                            const std::int32_t msb_position ) {
     std::int32_t result = value;
 
     // Extract 20 bit value
@@ -67,6 +75,52 @@ struct Executor {
       return value;
     }
     return value;  // Same value is returned in case the msb is 0
+  }
+
+  static void beq_func( State& sys_state, const ConnectionInfo& conn_info ) {
+    int* rf = sys_state.register_file;
+    std::int32_t rs1 = rf[conn_info.operand1];
+    std::int32_t rs2 = rf[conn_info.operand2];
+    std::int32_t offset = sext( conn_info.operand3, 12 );
+
+    if ( rs1 == rs2 ) {
+      sys_state.PC -= 32;  // Reverse the change made by fetch
+      sys_state.PC += translateAddress( offset );
+    }
+  }
+
+  static void blt_func( State& sys_state, const ConnectionInfo& conn_info ) {
+    int* rf = sys_state.register_file;
+    std::int32_t rs1 = rf[conn_info.operand1];
+    std::int32_t rs2 = rf[conn_info.operand2];
+    std::int32_t offset = sext( conn_info.operand3, 12 );
+
+    if ( rs1 < rs2 ) {
+      sys_state.PC -= 32;  // Reverse the change made by fetch
+      sys_state.PC += translateAddress( offset );
+    }
+  }
+  static void bge_func( State& sys_state, const ConnectionInfo& conn_info ) {
+    int* rf = sys_state.register_file;
+    std::int32_t rs1 = rf[conn_info.operand1];
+    std::int32_t rs2 = rf[conn_info.operand2];
+    std::int32_t offset = sext( conn_info.operand3, 12 );
+
+    if ( rs1 >= rs2 ) {
+      sys_state.PC -= 32;  // Reverse the change made by fetch
+      sys_state.PC += translateAddress( offset );
+    }
+  }
+  static void bne_func( State& sys_state, const ConnectionInfo& conn_info ) {
+    int* rf = sys_state.register_file;
+    std::int32_t rs1 = rf[conn_info.operand1];
+    std::int32_t rs2 = rf[conn_info.operand2];
+    std::int32_t offset = sext( conn_info.operand3, 12 );
+
+    if ( rs1 != rs2 ) {
+      sys_state.PC -= 32;  // Reverse the change made by fetch
+      sys_state.PC += translateAddress( offset );
+    }
   }
 
  public:  // API
@@ -90,6 +144,14 @@ struct Executor {
                         { "sll", std::bind( &sll_func, std::placeholders::_1,
                                             std::placeholders::_2 ) },
                         { "sra", std::bind( &sra_func, std::placeholders::_1,
+                                            std::placeholders::_2 ) },
+                        { "beq", std::bind( &beq_func, std::placeholders::_1,
+                                            std::placeholders::_2 ) },
+                        { "blt", std::bind( &blt_func, std::placeholders::_1,
+                                            std::placeholders::_2 ) },
+                        { "bge", std::bind( &bge_func, std::placeholders::_1,
+                                            std::placeholders::_2 ) },
+                        { "bne", std::bind( &bne_func, std::placeholders::_1,
                                             std::placeholders::_2 ) } };
 };
 
@@ -128,6 +190,8 @@ struct CPU {
 }  // namespace cpu
 
 using namespace cpu;
+
+std::string get_examples_dir() { return std::string( EXAMPLES ); }
 
 BOOST_AUTO_TEST_SUITE( cpu_test_suite )
 
@@ -242,6 +306,97 @@ BOOST_AUTO_TEST_CASE( sra_test ) {
   test_cpu.runProgram( program );
 
   BOOST_REQUIRE_EQUAL( rf[1], 0 );
+}
+
+// SB Type Test
+BOOST_AUTO_TEST_CASE( beq_test ) {
+  CPU test_cpu;
+  assembler::turbo_asm engine( get_examples_dir() + "cpu_sample1.s" );
+  std::string binary = engine.dumpBinary();
+
+  int* rf = test_cpu.getSystemState().register_file;
+
+  rf[2] = 10;
+  rf[3] = -15;
+  rf[4] = -5;
+  rf[7] = 1;
+
+  test_cpu.runProgram( binary );
+
+  BOOST_REQUIRE_EQUAL( rf[5], 0 );
+  BOOST_REQUIRE_EQUAL( rf[6], 2 );
+}
+
+BOOST_AUTO_TEST_CASE( blt_test ) {
+  CPU test_cpu;
+  assembler::turbo_asm engine( get_examples_dir() + "cpu_sample2.s" );
+  std::string binary = engine.dumpBinary();
+
+  int* rf = test_cpu.getSystemState().register_file;
+
+  rf[2] = 10;
+  rf[3] = -15;
+  rf[4] = -5;
+  rf[7] = 1;
+
+  test_cpu.runProgram( binary );
+
+  BOOST_REQUIRE_EQUAL( rf[5], 0 );
+  BOOST_REQUIRE_EQUAL( rf[6], 2 );
+}
+
+BOOST_AUTO_TEST_CASE( bge_test ) {
+  CPU test_cpu;
+  assembler::turbo_asm engine( get_examples_dir() + "cpu_sample3.s" );
+  std::string binary = engine.dumpBinary();
+
+  int* rf = test_cpu.getSystemState().register_file;
+
+  rf[2] = 10;
+  rf[3] = -15;
+  rf[4] = -5;
+  rf[7] = 1;
+
+  test_cpu.runProgram( binary );
+
+  BOOST_REQUIRE_EQUAL( rf[5], 0 );
+  BOOST_REQUIRE_EQUAL( rf[6], 2 );
+}
+
+BOOST_AUTO_TEST_CASE( bne_test ) {
+  CPU test_cpu;
+  assembler::turbo_asm engine( get_examples_dir() + "cpu_sample3.s" );
+  std::string binary = engine.dumpBinary();
+
+  int* rf = test_cpu.getSystemState().register_file;
+
+  rf[2] = 10;
+  rf[3] = -15;
+  rf[4] = -5;
+  rf[7] = 1;
+
+  test_cpu.runProgram( binary );
+
+  BOOST_REQUIRE_EQUAL( rf[5], 0 );
+  BOOST_REQUIRE_EQUAL( rf[6], 2 );
+}
+
+BOOST_AUTO_TEST_CASE( bne_test_true ) {
+  CPU test_cpu;
+  assembler::turbo_asm engine( get_examples_dir() + "cpu_sample4.s" );
+  std::string binary = engine.dumpBinary();
+
+  int* rf = test_cpu.getSystemState().register_file;
+
+  rf[2] = 10;
+  rf[3] = -15;
+  rf[4] = -5;
+  rf[7] = 1;
+
+  test_cpu.runProgram( binary );
+
+  BOOST_REQUIRE_EQUAL( rf[5], 2 );
+  BOOST_REQUIRE_EQUAL( rf[6], 2 );
 }
 
 BOOST_AUTO_TEST_SUITE_END()
