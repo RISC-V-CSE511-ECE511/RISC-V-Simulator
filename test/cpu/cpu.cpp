@@ -586,3 +586,23 @@ BOOST_AUTO_TEST_CASE( sw_test ) {
 }
 
 BOOST_AUTO_TEST_SUITE_END()
+
+BOOST_AUTO_TEST_CASE( jal_test ) {
+  CPU test_cpu;
+
+  int* rf = test_cpu.getSystemState().register_file;
+
+  std::string program =
+      "00000000001100010000000010110011"
+      "00000000100000000000001011101111"
+      "00000000000100001000011001100011"
+      "00000000001100001000000010110011"
+      "00000000000000101000001001100111";
+
+  rf[2] = 1;
+  rf[3] = 1;
+
+  test_cpu.runProgram( program );
+
+  BOOST_REQUIRE_EQUAL( rf[1], 3 );
+}
