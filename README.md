@@ -16,3 +16,8 @@ The following extension must be installed in vscode for devcontainers to work.
 
 - [Remote - Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)
 
+
+### Additional Dependencies
+
+- fmt  `sudo apt-get install -y libfmt-dev `
+- ranges `sudo apt-get install -y libranges-v3-dev`
