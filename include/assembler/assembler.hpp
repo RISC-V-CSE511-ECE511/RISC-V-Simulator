@@ -35,6 +35,15 @@ struct turbo_asm {
     file.close();
   }
 
+  std::string dumpBinary() {
+    std::string result_binary;
+    for ( auto& instruction : m_instructions ) {
+      std::string binary_encoding = instruction.getBinaryEncoding();
+      result_binary += binary_encoding;
+    }
+    return result_binary;
+  }
+
   std::vector<Instruction> getInstructions() { return m_instructions; }
 
  private:
@@ -68,8 +77,8 @@ struct turbo_asm {
       for ( auto operand : instruction.getOperands() ) {
         if ( operand->getOperandType() == Operand::OperandType::LabelOp ) {
           Label* label_operand = (Label*)operand.get();
-          label_operand->setAddress(
-              m_label_adr_map[label_operand->getName()] - current_instruction_loc );
+          label_operand->setAddress( m_label_adr_map[label_operand->getName()] -
+                                     current_instruction_loc );
           label_operand->setOperandLength( 12 );
         }
       }
