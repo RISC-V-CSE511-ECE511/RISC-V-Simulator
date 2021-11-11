@@ -21,7 +21,7 @@ struct Decoder {
       { "1100110", InstructionType::R },  { "1100100", InstructionType::I },
       { "1100000", InstructionType::I },  { "1100010", InstructionType::S },
       { "1100011", InstructionType::SB }, { "1110110", InstructionType::U },
-      { "1111011", InstructionType::UJ } };
+      { "1111011", InstructionType::UJ }, { "1110011", InstructionType::UJ } };
 
  public:
   static ConnectionInfo decode( const std::string& instruction ) {
@@ -58,7 +58,7 @@ struct Decoder {
         instruction_name = UInstr::getInstructionName( instruction );
         break;
       case InstructionType::UJ:
-        instruction_name = UInstr::getInstructionName( instruction );
+        instruction_name = UJInstr::getInstructionName( instruction );
         break;
     }
     return instruction_name;
@@ -83,7 +83,7 @@ struct Decoder {
         op1 = UInstr::getOperand1( instruction );
         break;
       case InstructionType::UJ:
-        op1 = UInstr::getOperand1( instruction );
+        op1 = UJInstr::getOperand1( instruction );
         break;
     }
     return op1;

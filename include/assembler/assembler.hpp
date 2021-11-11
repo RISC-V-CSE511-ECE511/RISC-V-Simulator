@@ -77,7 +77,7 @@ struct turbo_asm {
           Label* label_operand = (Label*)operand.get();
           label_operand->setAddress( m_label_adr_map[label_operand->getName()] -
                                      current_instruction_loc );
-          label_operand->setOperandLength( 12 );
+          //label_operand->setOperandLength( 12 );
         }
       }
       current_instruction_loc += 4;

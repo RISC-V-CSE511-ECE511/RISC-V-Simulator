@@ -33,7 +33,7 @@ struct SBInstr {
 
     immediate_value += tmp1;
 
-    std::string tmp2( instruction.rbegin() + 8, instruction.rbegin() + 11 );
+    std::string tmp2( instruction.rbegin() + 8, instruction.rbegin() + 12 );
     std::reverse( tmp2.begin(), tmp2.end() );
 
     immediate_value += tmp2;

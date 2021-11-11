@@ -196,6 +196,7 @@ struct Instruction {
 
     encoded_string = fmt::format( m_opcode_map[m_instr_name], offset_p1, rs2,
                                   rs1, offset_p2 );
+    auto sz = encoded_string.size();
     return encoded_string;
   }
 
@@ -248,9 +249,14 @@ struct Instruction {
         case Operand::OperandType::RegisterOp:
           m_operands.emplace_back( new Register( component ) );
           break;
-        case Operand::OperandType::LabelOp:
-          m_operands.emplace_back( new Label( component ) );
+        case Operand::OperandType::LabelOp: {
+          std::int32_t op_len = m_immediate_length_map.find( m_instr_name ) ==
+                                        m_immediate_length_map.end()
+                                    ? 12
+                                    : m_immediate_length_map[m_instr_name];
+          m_operands.emplace_back( new Label( component, op_len ) );
           break;
+        }
         case Operand::OperandType::ImmediateOp:
           m_operands.emplace_back( new Immediate(
               std::stoll( std::string( component ) ),
