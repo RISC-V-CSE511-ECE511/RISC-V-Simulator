@@ -79,6 +79,7 @@ struct Executor {
 
   static void beq_func( State& sys_state, const ConnectionInfo& conn_info ) {
     int* rf = sys_state.register_file;
+
     std::int32_t rs1 = rf[conn_info.operand1];
     std::int32_t rs2 = rf[conn_info.operand2];
     std::int32_t offset = sext( conn_info.operand3, 12 );
@@ -91,6 +92,7 @@ struct Executor {
 
   static void blt_func( State& sys_state, const ConnectionInfo& conn_info ) {
     int* rf = sys_state.register_file;
+
     std::int32_t rs1 = rf[conn_info.operand1];
     std::int32_t rs2 = rf[conn_info.operand2];
     std::int32_t offset = sext( conn_info.operand3, 12 );
@@ -102,6 +104,7 @@ struct Executor {
   }
   static void bge_func( State& sys_state, const ConnectionInfo& conn_info ) {
     int* rf = sys_state.register_file;
+
     std::int32_t rs1 = rf[conn_info.operand1];
     std::int32_t rs2 = rf[conn_info.operand2];
     std::int32_t offset = sext( conn_info.operand3, 12 );
@@ -113,6 +116,7 @@ struct Executor {
   }
   static void bne_func( State& sys_state, const ConnectionInfo& conn_info ) {
     int* rf = sys_state.register_file;
+
     std::int32_t rs1 = rf[conn_info.operand1];
     std::int32_t rs2 = rf[conn_info.operand2];
     std::int32_t offset = sext( conn_info.operand3, 12 );
@@ -121,6 +125,18 @@ struct Executor {
       sys_state.PC -= 32;  // Reverse the change made by fetch
       sys_state.PC += translateAddress( offset );
     }
+  }
+
+  // U Type Support
+  static void lui_func( State& sys_state, const ConnectionInfo& conn_info ) {
+    int* rf = sys_state.register_file;
+
+    std::int32_t& rd = rf[conn_info.operand1];
+    std::int32_t immediate = conn_info.operand2;
+
+    immediate = ( immediate << 12 ) & ( ( ~0 ) << 12 );
+
+    rd = sext( immediate, 32 );
   }
 
  public:  // API
@@ -152,6 +168,8 @@ struct Executor {
                         { "bge", std::bind( &bge_func, std::placeholders::_1,
                                             std::placeholders::_2 ) },
                         { "bne", std::bind( &bne_func, std::placeholders::_1,
+                                            std::placeholders::_2 ) },
+                        { "lui", std::bind( &lui_func, std::placeholders::_1,
                                             std::placeholders::_2 ) } };
 };
 
@@ -397,6 +415,20 @@ BOOST_AUTO_TEST_CASE( bne_test_true ) {
 
   BOOST_REQUIRE_EQUAL( rf[5], 2 );
   BOOST_REQUIRE_EQUAL( rf[6], 2 );
+}
+
+// I
+BOOST_AUTO_TEST_CASE( lui_test ) {
+  CPU test_cpu;
+
+  assembler::turbo_asm engine( get_examples_dir() + "cpu_sample5.s" );
+  std::string binary = engine.dumpBinary();
+
+  int* rf = test_cpu.getSystemState().register_file;
+
+  test_cpu.runProgram( binary );
+
+  BOOST_REQUIRE_EQUAL( rf[1], 4194304 );
 }
 
 BOOST_AUTO_TEST_SUITE_END()
