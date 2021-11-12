@@ -1,3 +1,5 @@
+#include <unistd.h>
+
 #include <assembler/instruction.hpp>
 #include <assembler/operand.hpp>
 #include <fstream>
@@ -60,12 +62,19 @@ struct turbo_asm {
     std::int32_t current_instr_address = 0;
     for ( auto& raw_instruction : raw_instructions ) {
       Instruction instr = Instruction( std::string( raw_instruction ) );
+
       if ( instr.hasLabel() ) {
         m_label_adr_map[std::string( instr.getLabelName() )] =
             current_instr_address;
+
+        if ( !instr.getName().empty() ) {
+          current_instr_address += 4;
+        }
+
+      } else {
+        current_instr_address += 4;
       }
       m_instructions.emplace_back( instr );
-      current_instr_address += 4;
     }
   }
 
@@ -77,7 +86,7 @@ struct turbo_asm {
           Label* label_operand = (Label*)operand.get();
           label_operand->setAddress( m_label_adr_map[label_operand->getName()] -
                                      current_instruction_loc );
-          //label_operand->setOperandLength( 12 );
+          // label_operand->setOperandLength( 12 );
         }
       }
       current_instruction_loc += 4;
