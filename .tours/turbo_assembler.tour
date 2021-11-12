@@ -1,0 +1,82 @@
+{
+  "$schema": "https://aka.ms/codetour-schema",
+  "title": "turbo_assembler",
+  "steps": [
+    {
+      "file": "include/assembler/assembler.hpp",
+      "description": "This struct exposes the API for interacting with the assembler",
+      "line": 13
+    },
+    {
+      "file": "include/assembler/assembler.hpp",
+      "description": "By default the ctor takes a filename as string and parses each of the instructions into an object of Instruction class",
+      "line": 20
+    },
+    {
+      "file": "include/assembler/assembler.hpp",
+      "description": "Generates a binary representation for each of the instructions and concats them to a single string",
+      "line": 38
+    },
+    {
+      "file": "include/assembler/assembler.hpp",
+      "description": "Splits each line with newline('\\n') as delimiter and transforms the range generated into a string view of the original string",
+      "line": 50
+    },
+    {
+      "file": "include/assembler/assembler.hpp",
+      "description": "Converts raw instructions into Instruction struct objects",
+      "line": 61
+    },
+    {
+      "file": "include/assembler/assembler.hpp",
+      "description": "Second stage of the assembler for resolving the labels being referenced. After resolving the labels only we can generate binary information",
+      "line": 81
+    },
+    {
+      "file": "include/assembler/instruction.hpp",
+      "description": "Stores all the metadata about a perticular instruction",
+      "line": 19
+    },
+    {
+      "file": "include/assembler/instruction.hpp",
+      "description": "opcode map proves a unique opcode for each of the instructions along with placeholders into which the operands can be placed",
+      "line": 25
+    },
+    {
+      "file": "include/assembler/operand.hpp",
+      "description": "Interface for representing the Operands",
+      "line": 8
+    },
+    {
+      "file": "include/assembler/operand.hpp",
+      "description": "Identifies the type of operand based on component value",
+      "line": 10
+    },
+    {
+      "file": "include/assembler/immediate.hpp",
+      "description": "Stores/ Represents an immediate value",
+      "line": 10
+    },
+    {
+      "file": "include/assembler/immediate.hpp",
+      "description": "Generates a binary representation using bitset and ranges",
+      "line": 26
+    },
+    {
+      "file": "include/assembler/label.hpp",
+      "description": "Represents the label operand ( operand_length, binary representation of label, label address )",
+      "line": 10
+    },
+    {
+      "file": "include/assembler/register.hpp",
+      "description": "Represents a register operand and provides functions to generated the binary value for a label",
+      "line": 10
+    },
+    {
+      "file": "include/assembler/register_displacement.hpp",
+      "description": "For special cases where there is Indirect Addressing (Register + Offset)",
+      "line": 8
+    }
+  ],
+  "ref": "4392f3ad90551dde56907ae6dd8a5e0f39b251ba"
+}

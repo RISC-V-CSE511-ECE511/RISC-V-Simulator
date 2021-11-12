@@ -1,0 +1,72 @@
+{
+  "$schema": "https://aka.ms/codetour-schema",
+  "title": "simulator",
+  "steps": [
+    {
+      "file": "include/cpu/simulator.hpp",
+      "description": "API for running and interacting with the Simulator",
+      "line": 12
+    },
+    {
+      "file": "include/cpu/simulator.hpp",
+      "description": "Places the program in memory and executes each of the instructions",
+      "line": 18
+    },
+    {
+      "file": "include/cpu/simulator.hpp",
+      "description": "Simple Fetch Decode Execute Cycle",
+      "line": 21
+    },
+    {
+      "file": "include/cpu/simulator.hpp",
+      "description": "Fetches an Instruction from memory ( Here 32bits is 32 bytes as 8byte represents 1 byte)",
+      "line": 38
+    },
+    {
+      "file": "include/cpu/simulator.hpp",
+      "description": "Loads the entire program into memory and sets the halt address accordingly",
+      "line": 48
+    },
+    {
+      "file": "include/cpu/simulator.hpp",
+      "description": "Initializes the memory with '0' till mem_size",
+      "line": 55
+    },
+    {
+      "file": "include/cpu/decoder/decoder.hpp",
+      "description": "Decodes the instruction and generates a connection info object that basically describes the data path and operand values",
+      "line": 19
+    },
+    {
+      "file": "include/cpu/decoder/connection_info.hpp",
+      "description": "Represents the data path and immediate values for an instruction",
+      "line": 9
+    },
+    {
+      "file": "include/cpu/executor..hpp",
+      "description": "Represents the operations that can be performed by CPU / Implementation of the Instructions",
+      "line": 9
+    },
+    {
+      "file": "include/cpu/executor..hpp",
+      "description": "Represents the bindings between instructions and their implementation",
+      "line": 234
+    },
+    {
+      "file": "include/cpu/executor..hpp",
+      "description": "Gets the operation to perform and invokes the implementation",
+      "line": 274
+    },
+    {
+      "file": "include/cpu/executor..hpp",
+      "description": "For loading x bytes",
+      "line": 212
+    },
+    {
+      "file": "include/cpu/executor..hpp",
+      "description": "For storing value into memory",
+      "line": 222
+    }
+  ],
+  "ref": "4392f3ad90551dde56907ae6dd8a5e0f39b251ba"
+}

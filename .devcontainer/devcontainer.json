@@ -28,7 +28,8 @@
 		"ms-vscode.cmake-tools",
 		"cschlosser.doxdocgen",
 		"github.vscode-pull-request-github",
-		"llvm-vs-code-extensions.vscode-clangd"
+		"llvm-vs-code-extensions.vscode-clangd",
+		"vsls-contrib.codetour"
 	],
 	// Use 'forwardPorts' to make a list of ports inside the container available locally.
 	// "forwardPorts": [],
