@@ -19,12 +19,17 @@ struct CPU {
     loadProgram( program );
     // Logic for this needs to be changed
     while ( sys_state.PC != sys_state.halt_adr ) {
+      // Reset cycles consumed for every new instruction
+      sys_state.cycles_consumed = 0;
       // fetch Instruction
       sys_state.IR = fetchInstruction();
       // Decode Instruction and Get Connection Information
-      ConnectionInfo conn_info = Decoder::decode( sys_state.IR );
+      auto [cycles_consumed, conn_info] = Decoder::decode( sys_state.IR );
+      sys_state.cycles_consumed += cycles_consumed;
       // Execute Instruction
       Executor::execute( sys_state, conn_info );
+
+      sys_state.instr_cycles_consumed.push_back( sys_state.cycles_consumed );
     }
   }
 
@@ -34,6 +39,7 @@ struct CPU {
         sys_state.memory.begin() + sys_state.PC,
         sys_state.memory.begin() + sys_state.PC + 32 );  // Getting 4 bytes
     sys_state.PC += 32;
+    sys_state.cycles_consumed += sys_state.memory_access_latency;
     return instruction;
   }
 
@@ -41,6 +47,7 @@ struct CPU {
     std::copy( program.begin(), program.end(), sys_state.memory.begin() );
     sys_state.halt_adr =
         program.size();  // Will need to change for multiple program
+    sys_state.total_instructions = program.size() / ( 32 * 8 );
   }
 
   void initializeMemory( std::int32_t mem_size ) {

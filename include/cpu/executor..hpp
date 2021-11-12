@@ -12,30 +12,44 @@ struct Executor {
   static void add_func( State& sys_state, const ConnectionInfo& conn_info ) {
     int* rf = sys_state.register_file;
     rf[conn_info.operand1] = rf[conn_info.operand2] + rf[conn_info.operand3];
+
+    sys_state.cycles_consumed += sys_state.execute_time;
   }
   static void sub_func( State& sys_state, const ConnectionInfo& conn_info ) {
     int* rf = sys_state.register_file;
     rf[conn_info.operand1] = rf[conn_info.operand2] - rf[conn_info.operand3];
+
+    sys_state.cycles_consumed += sys_state.execute_time;
   }
   static void xor_func( State& sys_state, const ConnectionInfo& conn_info ) {
     int* rf = sys_state.register_file;
     rf[conn_info.operand1] = rf[conn_info.operand2] ^ rf[conn_info.operand3];
+
+    sys_state.cycles_consumed += sys_state.execute_time;
   }
   static void and_func( State& sys_state, const ConnectionInfo& conn_info ) {
     int* rf = sys_state.register_file;
     rf[conn_info.operand1] = rf[conn_info.operand2] & rf[conn_info.operand3];
+
+    sys_state.cycles_consumed += sys_state.execute_time;
   }
   static void or_func( State& sys_state, const ConnectionInfo& conn_info ) {
     int* rf = sys_state.register_file;
     rf[conn_info.operand1] = rf[conn_info.operand2] | rf[conn_info.operand3];
+
+    sys_state.cycles_consumed += sys_state.execute_time;
   }
   static void sll_func( State& sys_state, const ConnectionInfo& conn_info ) {
     int* rf = sys_state.register_file;
     rf[conn_info.operand1] = rf[conn_info.operand2] << rf[conn_info.operand3];
+
+    sys_state.cycles_consumed += sys_state.execute_time;
   }
   static void sra_func( State& sys_state, const ConnectionInfo& conn_info ) {
     int* rf = sys_state.register_file;
     rf[conn_info.operand1] = rf[conn_info.operand2] >> rf[conn_info.operand3];
+
+    sys_state.cycles_consumed += sys_state.execute_time;
   }
 
   // SB Type
@@ -73,6 +87,7 @@ struct Executor {
       sys_state.PC -= 32;  // Reverse the change made by fetch
       sys_state.PC += translateAddress( offset );
     }
+    sys_state.cycles_consumed += sys_state.execute_time;
   }
 
   static void blt_func( State& sys_state, const ConnectionInfo& conn_info ) {
@@ -86,6 +101,7 @@ struct Executor {
       sys_state.PC -= 32;  // Reverse the change made by fetch
       sys_state.PC += translateAddress( offset );
     }
+    sys_state.cycles_consumed += sys_state.execute_time;
   }
   static void bge_func( State& sys_state, const ConnectionInfo& conn_info ) {
     int* rf = sys_state.register_file;
@@ -98,6 +114,7 @@ struct Executor {
       sys_state.PC -= 32;  // Reverse the change made by fetch
       sys_state.PC += translateAddress( offset );
     }
+    sys_state.cycles_consumed += sys_state.execute_time;
   }
   static void bne_func( State& sys_state, const ConnectionInfo& conn_info ) {
     int* rf = sys_state.register_file;
@@ -110,6 +127,7 @@ struct Executor {
       sys_state.PC -= 32;  // Reverse the change made by fetch
       sys_state.PC += translateAddress( offset );
     }
+    sys_state.cycles_consumed += sys_state.execute_time;
   }
 
   // U Type Support
@@ -122,6 +140,8 @@ struct Executor {
     immediate = ( immediate << 12 ) & ( ( ~0 ) << 12 );
 
     rd = sext( immediate, 32 );
+
+    sys_state.cycles_consumed += sys_state.execute_time;
   }
 
   // I Type Support
@@ -133,6 +153,8 @@ struct Executor {
     std::int32_t immediate = sext( conn_info.operand3, 12 );
 
     rd = rs1 + immediate;
+
+    sys_state.cycles_consumed += sys_state.execute_time;
   }
 
   static void lw_func( State& sys_state, const ConnectionInfo& conn_info ) {
@@ -143,6 +165,8 @@ struct Executor {
     std::int32_t offset = sext( conn_info.operand3, 12 );
 
     rd = sext( loadFromMemory( sys_state.memory, rs1 + offset, 4 ), 32 );
+
+    sys_state.cycles_consumed += sys_state.memory_access_latency;
   }
 
   // S Type
@@ -154,6 +178,8 @@ struct Executor {
     std::int32_t offset = sext( conn_info.operand3, 12 );
 
     storeToMemory( rs2, sys_state.memory, rs1 + offset );
+
+    sys_state.cycles_consumed += sys_state.memory_access_latency;
   }
 
   static void jalr_func( State& sys_state, const ConnectionInfo& conn_info ) {
@@ -166,6 +192,8 @@ struct Executor {
     std::int32_t t = sys_state.PC;
     sys_state.PC = rs1 + sext( translateAddress( offset ), 12 );
     rd = sys_state.PC;
+
+    sys_state.cycles_consumed += sys_state.execute_time;
   }
 
   static void jal_func( State& sys_state, const ConnectionInfo& conn_info ) {
@@ -177,6 +205,8 @@ struct Executor {
     rd = sys_state.PC;  // Already updated by fetch
 
     sys_state.PC += offset - 32;  // Already updated by fetch
+
+    sys_state.cycles_consumed += sys_state.execute_time;
   }
 
   static std::int32_t loadFromMemory( const std::string& mem,

@@ -1,7 +1,7 @@
 #define BOOST_TEST_MODULE cpu_test
 
 #include <boost/test/unit_test.hpp>
-#include <cpu/cpu_impl.hpp>
+#include <cpu/simulator.hpp>
 
 using namespace cpu;
 

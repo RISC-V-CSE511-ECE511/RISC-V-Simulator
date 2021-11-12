@@ -13,6 +13,7 @@
 #include <cpu/decoder/uj_instr.hpp>
 #include <string>
 #include <unordered_map>
+#include <utility>
 
 namespace cpu {
 struct Decoder {
@@ -24,14 +25,15 @@ struct Decoder {
       { "1111011", InstructionType::UJ }, { "1110011", InstructionType::UJ } };
 
  public:
-  static ConnectionInfo decode( const std::string& instruction ) {
+  static std::pair<std::int32_t, ConnectionInfo> decode(
+      const std::string& instruction ) {
     InstructionType instr_type = getType( instruction );
     ConnectionInfo info{ instr_type,
                          getInstructionName( instruction, instr_type ),
                          getOperand1( instruction, instr_type ),
                          getOperand2( instruction, instr_type ),
                          getOperand3( instruction, instr_type ) };
-    return info;
+    return std::make_pair( 1, info );
   }
   static InstructionType getType( const std::string& instruction ) {
     std::string opcode( instruction.rbegin(), instruction.rbegin() + 7 );

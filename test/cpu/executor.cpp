@@ -2,8 +2,8 @@
 
 #include <assembler/assembler.hpp>
 #include <boost/test/unit_test.hpp>
-#include <cpu/cpu_impl.hpp>
 #include <cpu/executor..hpp>
+#include <cpu/simulator.hpp>
 
 using namespace cpu;
 
