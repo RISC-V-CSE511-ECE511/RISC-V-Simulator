@@ -1,3 +1,3 @@
-FROM gk487/cpp:latest
+FROM gk487/cpp:clang
 USER sim
 
