@@ -33,6 +33,8 @@ struct CPU {
     }
   }
 
+  State& getSystemState() { return sys_state; }
+
   std::string fetchInstruction() {
     std::string instruction;
     instruction = std::string(
@@ -53,8 +55,6 @@ struct CPU {
   void initializeMemory( std::int32_t mem_size ) {
     sys_state.memory = std::string( mem_size, '0' );
   }
-
-  State& getSystemState() { return sys_state; }
 };
 
 }  // namespace cpu

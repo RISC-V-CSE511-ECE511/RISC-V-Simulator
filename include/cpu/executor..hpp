@@ -62,10 +62,10 @@ struct Executor {
                             const std::int32_t msb_position ) {
     std::int32_t result = value;
 
-    // Extract 20 bit value
+    // Extract msb_position value
     std::int32_t msb_value = ( value & ( 1 << ( msb_position - 1 ) ) );
 
-    // Check if the 20 bit is 1
+    // Check if the msb_position is 1
     if ( msb_value ) {
       // Mask out bits after msb as 1
       std::int32_t mask = ( ~0 ) << msb_position;
