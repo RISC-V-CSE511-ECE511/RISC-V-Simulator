@@ -1,5 +1,8 @@
 cmake_minimum_required(VERSION 3.18)
-project(RISC-V-SIM VERSION 0.1.0 LANGUAGES CXX)
+project(RISC-V-SIM
+        VERSION 0.1.0 
+        LANGUAGES CXX
+        HOMEPAGE_URL "https://github.com/RISC-V-CSE511-ECE511/RISC-V-Simulator")
 
 include(CTest)
 
