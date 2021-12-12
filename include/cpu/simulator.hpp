@@ -5,6 +5,7 @@
 #include <cpu/decoder/decoder.hpp>
 #include <cpu/executor..hpp>
 #include <cpu/state.hpp>
+#include <memory/memory_manager.hpp>
 #include <string>
 
 namespace cpu {
@@ -14,7 +15,6 @@ struct CPU {
   State sys_state;
 
  public:
-  CPU() { initializeMemory( 1024 ); }
   void runProgram( const std::string& program ) {
     loadProgram( program );
     // Logic for this needs to be changed
@@ -36,24 +36,17 @@ struct CPU {
   State& getSystemState() { return sys_state; }
 
   std::string fetchInstruction() {
-    std::string instruction;
-    instruction = std::string(
-        sys_state.memory.begin() + sys_state.PC,
-        sys_state.memory.begin() + sys_state.PC + 32 );  // Getting 4 bytes
-    sys_state.PC += 32;
+    std::string instruction( sys_state.memory_manager.read( sys_state.PC, 4 ) );
+    sys_state.PC += 4;
     sys_state.cycles_consumed += sys_state.memory_access_latency;
     return instruction;
   }
 
   void loadProgram( const std::string& program ) {
-    std::copy( program.begin(), program.end(), sys_state.memory.begin() );
+    sys_state.memory_manager.write( 0, program );
     sys_state.halt_adr =
-        program.size();  // Will need to change for multiple program
+        program.size() / 8;  // Will need to change for multiple program
     sys_state.total_instructions = program.size() / ( 32 * 8 );
-  }
-
-  void initializeMemory( std::int32_t mem_size ) {
-    sys_state.memory = std::string( mem_size, '0' );
   }
 };
 

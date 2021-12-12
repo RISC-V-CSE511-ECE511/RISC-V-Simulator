@@ -53,11 +53,6 @@ struct Executor {
   }
 
   // SB Type
-
-  static std::int32_t translateAddress( std::int32_t address ) {
-    return address * 8;
-  }
-
   static std::int32_t sext( const std::int32_t value,
                             const std::int32_t msb_position ) {
     std::int32_t result = value;
@@ -84,8 +79,8 @@ struct Executor {
     std::int32_t offset = sext( conn_info.operand3, 12 );
 
     if ( rs1 == rs2 ) {
-      sys_state.PC -= 32;  // Reverse the change made by fetch
-      sys_state.PC += translateAddress( offset );
+      sys_state.PC -= 4;  // Reverse the change made by fetch
+      sys_state.PC += offset;
     }
     sys_state.cycles_consumed += sys_state.execute_time;
   }
@@ -98,8 +93,8 @@ struct Executor {
     std::int32_t offset = sext( conn_info.operand3, 12 );
 
     if ( rs1 < rs2 ) {
-      sys_state.PC -= 32;  // Reverse the change made by fetch
-      sys_state.PC += translateAddress( offset );
+      sys_state.PC -= 4;  // Reverse the change made by fetch
+      sys_state.PC += offset;
     }
     sys_state.cycles_consumed += sys_state.execute_time;
   }
@@ -111,8 +106,8 @@ struct Executor {
     std::int32_t offset = sext( conn_info.operand3, 12 );
 
     if ( rs1 >= rs2 ) {
-      sys_state.PC -= 32;  // Reverse the change made by fetch
-      sys_state.PC += translateAddress( offset );
+      sys_state.PC -= 4;  // Reverse the change made by fetch
+      sys_state.PC += offset;
     }
     sys_state.cycles_consumed += sys_state.execute_time;
   }
@@ -124,8 +119,8 @@ struct Executor {
     std::int32_t offset = sext( conn_info.operand3, 12 );
 
     if ( rs1 != rs2 ) {
-      sys_state.PC -= 32;  // Reverse the change made by fetch
-      sys_state.PC += translateAddress( offset );
+      sys_state.PC -= 4;  // Reverse the change made by fetch
+      sys_state.PC += offset;
     }
     sys_state.cycles_consumed += sys_state.execute_time;
   }
@@ -164,7 +159,8 @@ struct Executor {
     std::int32_t rs1 = rf[conn_info.operand2];
     std::int32_t offset = sext( conn_info.operand3, 12 );
 
-    rd = sext( loadFromMemory( sys_state.memory, rs1 + offset, 4 ), 32 );
+    rd = sext( loadFromMemory( sys_state, rs1 + offset, 4 ), 32 );
+    // rd = sext( loadFromMemory( sys_state.memory, rs1 + offset, 4 ), 32 );
 
     sys_state.cycles_consumed += sys_state.memory_access_latency;
   }
@@ -177,8 +173,8 @@ struct Executor {
     std::int32_t rs1 = rf[conn_info.operand2];
     std::int32_t offset = sext( conn_info.operand3, 12 );
 
-    storeToMemory( rs2, sys_state.memory, rs1 + offset );
-
+    // storeToMemory( rs2, sys_state.memory, rs1 + offset );
+    storeToMemory( sys_state, rs1 + offset, rs2 );
     sys_state.cycles_consumed += sys_state.memory_access_latency;
   }
 
@@ -190,8 +186,8 @@ struct Executor {
     std::int32_t offset = sext( conn_info.operand3, 12 );
 
     std::int32_t t = sys_state.PC;
-    sys_state.PC = rs1 + sext( translateAddress( offset ), 12 );
-    rd = sys_state.PC;
+    sys_state.PC = rs1 + sext( offset, 12 );
+    rd = sys_state.PC;  // t possibly
 
     sys_state.cycles_consumed += sys_state.execute_time;
   }
@@ -200,32 +196,48 @@ struct Executor {
     int* rf = sys_state.register_file;
 
     std::int32_t& rd = rf[conn_info.operand1];
-    std::int32_t offset = sext( translateAddress( conn_info.operand2 ), 12 );
+    std::int32_t offset = sext( conn_info.operand2, 12 );
 
     rd = sys_state.PC;  // Already updated by fetch
 
-    sys_state.PC += offset - 32;  // Already updated by fetch
+    sys_state.PC += offset - 4;  // Already updated by fetch
 
     sys_state.cycles_consumed += sys_state.execute_time;
   }
 
-  static std::int32_t loadFromMemory( const std::string& mem,
-                                      std::int32_t address,
+  // static std::int32_t loadFromMemory( const std::string& mem,
+  //                                     std::int32_t address,
+  //                                     std::int32_t num_bytes_to_read ) {
+  //   std::int32_t actual_address = address * 8;
+  //   std::string val( mem.begin() + actual_address,
+  //                    mem.begin() + actual_address + ( num_bytes_to_read * 8 )
+  //                    );
+  //   std::reverse( val.begin(), val.end() );
+  //   return std::stoi( val, nullptr, 2 );
+  // }
+
+  static std::int32_t loadFromMemory( State& sys_state, std::int32_t address,
                                       std::int32_t num_bytes_to_read ) {
-    std::int32_t actual_address = address * 8;
-    std::string val( mem.begin() + actual_address,
-                     mem.begin() + actual_address + ( num_bytes_to_read * 8 ) );
+    std::string val =
+        sys_state.memory_manager.read( address, num_bytes_to_read );
     std::reverse( val.begin(), val.end() );
     return std::stoi( val, nullptr, 2 );
   }
 
-  static void storeToMemory( std::int32_t value, std::string& mem,
-                             std::int32_t address ) {
-    std::int32_t actual_address = address * 8;
+  // static void storeToMemory( std::int32_t value, std::string& mem,
+  //                            std::int32_t address ) {
+  //   std::int32_t actual_address = address * 8;
+  //   std::string binary_value = std::bitset<32>( value ).to_string();
+  //   std::reverse( binary_value.begin(), binary_value.end() );
+  //   std::copy( binary_value.begin(), binary_value.end(),
+  //              mem.begin() + actual_address );
+  // }
+
+  static void storeToMemory( State& sys_state, const std::int32_t address,
+                             const std::int32_t value ) {
     std::string binary_value = std::bitset<32>( value ).to_string();
     std::reverse( binary_value.begin(), binary_value.end() );
-    std::copy( binary_value.begin(), binary_value.end(),
-               mem.begin() + actual_address );
+    sys_state.memory_manager.write( address, binary_value );
   }
 
  private:

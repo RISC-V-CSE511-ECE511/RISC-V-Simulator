@@ -237,8 +237,11 @@ BOOST_AUTO_TEST_CASE( lw_test ) {
   std::int32_t test_value = 1024;
   std::string value = std::bitset<32>( test_value ).to_string();
   std::reverse( value.begin(), value.end() );
-  std::copy( value.begin(), value.end(),
-             test_cpu.getSystemState().memory.begin() + 32 );
+
+  test_cpu.getSystemState().memory_manager.write( 4, value );
+
+  // std::copy( value.begin(), value.end(),
+  //            test_cpu.getSystemState().memory.begin() + 32 );
 
   int* rf = test_cpu.getSystemState().register_file;
 
