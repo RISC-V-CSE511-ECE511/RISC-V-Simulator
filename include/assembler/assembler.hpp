@@ -81,6 +81,11 @@ struct turbo_asm {
   void resolveLabels() {
     std::int32_t current_instruction_loc = 0;
     for ( auto& instruction : m_instructions ) {
+      if ( instruction.hasLabel() && instruction.getName().empty() ) {
+        continue;  // No changes to current instr location
+      }
+
+      //-----------------------------------------------------------------
       for ( auto operand : instruction.getOperands() ) {
         if ( operand->getOperandType() == Operand::OperandType::LabelOp ) {
           Label* label_operand = (Label*)operand.get();
@@ -89,6 +94,8 @@ struct turbo_asm {
           // label_operand->setOperandLength( 12 );
         }
       }
+      //-----------------------------------------------------------------
+
       current_instruction_loc += 4;
     }
   }
