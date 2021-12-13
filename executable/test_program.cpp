@@ -13,8 +13,8 @@ int main() {
   std::string binary = engine.dumpBinary();
 
   // Passing that dump to the cpu for execution
-  cpu::CPU test_cpu( 512, 512, 8, memory::CacheWritePolicy::WRITEBACK,
-                     memory::CacheReplacementPolicy::LRU );
+  cpu::CPU test_cpu( 1024, 512, 8, memory::CacheWritePolicy::WRITEBACK,
+                     memory::CacheReplacementPolicy::FIFO );
   test_cpu.runProgram( binary );
   test_cpu.getSystemState().dumpState();
 
