@@ -23,7 +23,7 @@ struct CacheMemory {
   CacheReplacementPolicy m_replacement_policy;
   FifoEvictor fifo_evictor;
   RandomEvictor random_evictor;
-  lru_evictor lru_evictor;
+  Lru_Evictor lru_evictor;
 
  public:
   CacheMemory(

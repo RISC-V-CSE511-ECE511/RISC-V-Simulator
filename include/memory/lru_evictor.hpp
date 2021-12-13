@@ -7,7 +7,7 @@
 
 namespace memory {
 
-struct lru_evictor {
+struct Lru_Evictor {
  private:
   std::list<CacheBlock>& m_cache_blocks;
   std::deque<std::int32_t> m_addresses;
