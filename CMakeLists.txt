@@ -28,6 +28,7 @@ include_directories(${BOOST_INCLUDE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/include)
 enable_testing()
 
 add_subdirectory(test)
+add_subdirectory(executable)
 
 if(DEFINED ENV{GENERATE_BENCHMARK})
     find_package(benchmark CONFIG REQUIRED)
