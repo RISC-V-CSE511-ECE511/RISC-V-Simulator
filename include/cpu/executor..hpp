@@ -66,7 +66,7 @@ struct Executor {
       std::int32_t mask = ( ~0 ) << msb_position;
       // Apply the mask
       result = result | mask;
-      return value;
+      return result;
     }
     return value;  // Same value is returned in case the msb is 0
   }
