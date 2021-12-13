@@ -54,8 +54,8 @@ struct Instruction {
 
   std::unordered_map<std::string, std::int32_t> m_immediate_length_map{
       { "addi", 12 }, { "lui", 20 }, { "lw", 12 },  { "sw", 7 },
-      { "jalr", 12 }, { "jal", 20 }, { "beq", 12 }, { "bne", 12 },
-      { "blt", 12 },  { "bge", 12 } };
+      { "jalr", 12 }, { "jal", 20 }, { "beq", 13 }, { "bne", 13 },
+      { "blt", 13 },  { "bge", 13 } };
 
   std::vector<std::shared_ptr<assembler::Operand>> m_operands;
 
@@ -183,7 +183,7 @@ struct Instruction {
     std::string offset = getOperand( 2 )->getBinaryValue();
 
     std::string offset_p1;
-    offset_p1.push_back( '0' );  // 12th bit trailing 0
+    offset_p1.push_back( *( offset.rbegin() + 12 ) );               // 12th bit
     std::string tmp1( offset.rbegin() + 5, offset.rbegin() + 11 );  // [5:10]
     std::reverse( tmp1.begin(), tmp1.end() );                       // [10:5]
     offset_p1 += tmp1;
