@@ -48,6 +48,12 @@ struct State : public StateData {
 
     fmt::print( "Cache Hits : {}\n", cache_hits );
     fmt::print( "Cache Misses : {}\n", cache_miss );
+
+    fmt::print( "\nRegister File Info : \n------------\n" );
+
+    for ( auto i = 0; i < 32; i++ ) {
+      fmt::print( "\tRegister r{} : {}\n", i, register_file[i] );
+    }
   }
 };
 }  // namespace cpu
