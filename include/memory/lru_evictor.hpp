@@ -13,7 +13,7 @@ struct Lru_Evictor {
   std::deque<std::int32_t> m_addresses;
 
  public:
-  lru_evictor( std::list<CacheBlock>& cache_blocks )
+  Lru_Evictor( std::list<CacheBlock>& cache_blocks )
       : m_cache_blocks( cache_blocks ) {}
 
   CacheBlock evict() {
