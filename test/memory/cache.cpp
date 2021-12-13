@@ -90,7 +90,8 @@ BOOST_AUTO_TEST_CASE( write_through_test ) {
 
   MainMemory main_memory( 512, '0' );
 
-  CacheMemory cache_memory( main_memory, 4, 4, CacheMemory::WRITETHROUGH );
+  CacheMemory cache_memory( main_memory, 4, 4,
+                            memory::CacheWritePolicy::WRITETHROUGH );
 
   cache_memory.read( 100 );  // Bring data from adr 100 into cache
 
@@ -111,7 +112,8 @@ BOOST_AUTO_TEST_CASE( write_back_test ) {
 
   MainMemory main_memory( 512, '0' );
 
-  CacheMemory cache_memory( main_memory, 4, 4, CacheMemory::WRITEBACK );
+  CacheMemory cache_memory( main_memory, 4, 4,
+                            memory::CacheWritePolicy::WRITEBACK );
 
   cache_memory.read( 100 );
 

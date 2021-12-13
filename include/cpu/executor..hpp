@@ -161,8 +161,6 @@ struct Executor {
 
     rd = sext( loadFromMemory( sys_state, rs1 + offset, 4 ), 32 );
     // rd = sext( loadFromMemory( sys_state.memory, rs1 + offset, 4 ), 32 );
-
-    sys_state.cycles_consumed += sys_state.memory_access_latency;
   }
 
   // S Type
@@ -175,7 +173,6 @@ struct Executor {
 
     // storeToMemory( rs2, sys_state.memory, rs1 + offset );
     storeToMemory( sys_state, rs1 + offset, rs2 );
-    sys_state.cycles_consumed += sys_state.memory_access_latency;
   }
 
   static void jalr_func( State& sys_state, const ConnectionInfo& conn_info ) {

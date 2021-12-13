@@ -305,4 +305,13 @@ BOOST_AUTO_TEST_CASE( secret_jal_test ) {
   BOOST_REQUIRE_EQUAL( rf[1], 3 );
 }
 
+BOOST_AUTO_TEST_CASE( temp_test ) {
+  CPU test_cpu;
+
+  assembler::turbo_asm engine( get_examples_dir() + "sample10.s" );
+  std::string program = engine.dumpBinary();
+
+  test_cpu.runProgram( program );
+}
+
 BOOST_AUTO_TEST_SUITE_END()

@@ -4,6 +4,7 @@
 #include <limits>
 #include <list>
 #include <memory/cache_block.hpp>
+#include <memory/common_enums.hpp>
 #include <memory/fifo_evictor.hpp>
 #include <memory/lru_evictor.hpp>
 #include <memory/main_memory.hpp>
@@ -12,26 +13,24 @@
 namespace memory {
 
 struct CacheMemory {
-  enum WritePolicy { WRITEBACK, WRITETHROUGH };
-  enum ReplacementPolicy { FIFO, RANDOM, LRU };
-
  private:
   MainMemory& m_main_memory;
   std::int32_t m_cache_size;
   std::int32_t m_block_size;
   std::int32_t m_num_blocks;
   std::list<CacheBlock> cache_blocks;
-  WritePolicy m_write_policy;
-  ReplacementPolicy m_replacement_policy;
+  CacheWritePolicy m_write_policy;
+  CacheReplacementPolicy m_replacement_policy;
   FifoEvictor fifo_evictor;
   RandomEvictor random_evictor;
   lru_evictor lru_evictor;
 
  public:
-  CacheMemory( MainMemory& main_memory, const std::int32_t cache_size,
-               const std::int32_t block_size,
-               WritePolicy write_policy = WritePolicy::WRITEBACK,
-               ReplacementPolicy replacement_policy = ReplacementPolicy::FIFO )
+  CacheMemory(
+      MainMemory& main_memory, const std::int32_t cache_size,
+      const std::int32_t block_size,
+      CacheWritePolicy write_policy = CacheWritePolicy::WRITEBACK,
+      CacheReplacementPolicy replacement_policy = CacheReplacementPolicy::FIFO )
       : m_main_memory( main_memory ),
         m_cache_size( cache_size ),
         m_block_size( block_size ),
@@ -52,12 +51,22 @@ struct CacheMemory {
     // Reaching here means add the data to the cache
     update( address );
 
-    if ( m_replacement_policy == ReplacementPolicy::LRU ) {
+    if ( m_replacement_policy == CacheReplacementPolicy::LRU ) {
       lru_evictor.access( address );
     }
 
     return { false, {} };
   }
+
+  auto getCacheSize() { return m_cache_size; }
+
+  auto getBlockSize() { return m_block_size; }
+
+  auto getNumofBlocks() { return m_num_blocks; }
+
+  auto getReplacementPolicy() { return m_replacement_policy; }
+
+  auto getWritePolicy() { return m_write_policy; }
 
   bool write( const std::int32_t address, const std::string& data ) {
     auto block_loc = find_block( address );
@@ -65,7 +74,7 @@ struct CacheMemory {
     if ( block_loc != cache_blocks.end() ) {
       block_loc->write( address, data );
 
-      if ( m_write_policy == WritePolicy::WRITETHROUGH ) {
+      if ( m_write_policy == CacheWritePolicy::WRITETHROUGH ) {
         m_main_memory.write( address, data );
       }
 
@@ -113,7 +122,8 @@ struct CacheMemory {
   void evict_block() {
     CacheBlock evicted_block = removeBlock();
 
-    if ( evicted_block.isDirty() && m_write_policy == WritePolicy::WRITEBACK ) {
+    if ( evicted_block.isDirty() &&
+         m_write_policy == CacheWritePolicy::WRITEBACK ) {
       auto starting_address = evicted_block.getStartingAddress();
       auto block_data = evicted_block.get_raw_block_data();
 

@@ -24,6 +24,8 @@ struct MainMemory {
     std::copy( data.begin(), data.end(), start_pos );
   }
 
+  auto getSize() { return m_raw_memory.size(); }
+
  private:
   // Helpers
   std::int32_t translate( const std::int32_t address ) { return address * 8; }
