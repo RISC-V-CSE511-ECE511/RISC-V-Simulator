@@ -142,6 +142,8 @@ struct CacheMemory {
       case LRU:
         return lru_evictor.evict();
         break;
+      default:
+        return fifo_evictor.evict();
     }
   }
 };
