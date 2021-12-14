@@ -49,6 +49,11 @@ struct State : public StateData {
     fmt::print( "Cache Hits : {}\n", cache_hits );
     fmt::print( "Cache Misses : {}\n", cache_miss );
 
+    fmt::print( "Hit Rate: {}%\n",
+                ( cache_hits / float( cache_hits + cache_miss ) * 100 ) );
+    fmt::print( "Miss Rate: {}%\n",
+                ( cache_miss / float( cache_hits + cache_miss ) * 100 ) );
+
     fmt::print( "\nRegister File Info : \n------------\n" );
 
     for ( auto i = 0; i < 32; i++ ) {
