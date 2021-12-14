@@ -28,18 +28,24 @@ struct turbo_asm {
     resolveLabels();
   }
 
-  void dumpBinary( const std::string& filename ) {
+  void dumpBinary( const std::string& filename, const char delim = 0 ) {
     std::fstream file( filename, std::fstream::out );
-    std::string result_binary = dumpBinary();
+    std::string result_binary = dumpBinary( delim );
     file << result_binary;
     file.close();
   }
 
-  std::string dumpBinary() {
+  std::string dumpBinary( const char delim = 0 ) {
     std::string result_binary;
     for ( auto& instruction : m_instructions ) {
+      if ( instruction.hasLabel() && instruction.getName().empty() ) {
+        continue;
+      }
       std::string binary_encoding = instruction.getBinaryEncoding();
       result_binary += binary_encoding;
+      if ( delim != 0 ) {
+        result_binary += delim;
+      }
     }
     return result_binary;
   }

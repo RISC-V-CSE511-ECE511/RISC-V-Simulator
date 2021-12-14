@@ -58,5 +58,30 @@ BOOST_AUTO_TEST_CASE( assembler_test_3_large_file ) {
   BOOST_REQUIRE_EQUAL( file_stream.str(), resultant_binary );
 }
 
+BOOST_AUTO_TEST_CASE( assembler_test_3_large_file_newline_delimited ) {
+  turbo_asm asm_engine( get_examples_dir() + "sample3.s" );
+  asm_engine.dumpBinary( "sample3.txt", '\n' );
+
+  std::fstream file( "sample3.txt" );
+  std::stringstream file_stream;
+  file_stream << file.rdbuf();
+
+  std::string resultant_binary =
+      "00000000001100010000000010110011\n"
+      "01000000001100010000000010110011\n"
+      "01000000001100010000000010110011\n"
+      "01000000001100010000000010110011\n"
+      "01000000001100010000000010110011\n"
+      "00000010001000001000000001100011\n"
+      "01000000001100010000000010110011\n"
+      "01000000001100010000000010110011\n"
+      "01000000001100010000000010110011\n"
+      "01000000001100010000000010110011\n"
+      "01000000001100010000000010110011\n"
+      "01000000001100010000000010110011\n"
+      "01000000001100010000000010110011\n";
+
+  BOOST_REQUIRE_EQUAL( file_stream.str(), resultant_binary );
+}
 
 BOOST_AUTO_TEST_SUITE_END()
