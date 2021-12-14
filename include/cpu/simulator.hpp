@@ -27,8 +27,8 @@ struct CPU {
 
   {}
 
-  void runProgram( const std::string& program ) {
-    loadProgram( program );
+  void runProgram( const std::string& program, const char delim = 0 ) {
+    loadProgram( program, delim );
     // Logic for this needs to be changed
     while ( sys_state.PC != sys_state.halt_adr ) {
       // Reset cycles consumed for every new instruction
@@ -54,13 +54,19 @@ struct CPU {
     return instruction;
   }
 
-  void loadProgram( const std::string& program ) {
-    sys_state.memory_manager.write( 0, program );
+  void loadProgram( const std::string& program, const char delim = 0 ) {
+    std::string program_string = program;
+    if ( delim != 0 ) {
+      program_string.erase(
+          std::remove( program_string.begin(), program_string.end(), delim ),
+          program_string.end() );
+    }
+    sys_state.memory_manager.write( 0, program_string );
     sys_state.halt_adr =
-        program.size() / 8;  // Will need to change for multiple program
+        program_string.size() / 8;  // Will need to change for multiple program
 
     sys_state.cache_miss = 0;
-    sys_state.total_instructions = program.size() / ( 32 * 8 );
+    sys_state.total_instructions = program_string.size() / ( 4 * 8 );
   }
 };
 
